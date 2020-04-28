@@ -1,0 +1,136 @@
+{
+  "Api": {
+    "BaseUrl": "",
+    "EventHubEndpoint": "/hubs/cloudstack/game",
+    "GameEndpoint": "/v1/cloudstack/game"
+  },
+  "Chaos": {
+    "Enabled": true,
+    "PlaneEnabled": true,
+    "TankEnabled": true,
+    "MinimumBuildings": 2
+  },
+  "Grid": {
+    "TilesPerStreet": 50
+  },
+  "Layers": {
+    "Enabled": true
+  },
+  "Teams": {
+    "Enabled": true
+  },
+  "AssetBundle": {
+    "Name": "free",
+    "BuildingDecayAgeThreshold": 100,
+    "StagingBuildingPrefab": "BuildingConstruction",
+    "Buildings": [
+      {
+        "Prefabs": [
+          {
+            "Name": "ExtraSmallBuilding",
+            "Rotation": 0
+          }
+        ],
+        "DecayedPrefabs": [
+          {
+            "Name": "ExtraSmallBuildingDecayed",
+            "Rotation": 0
+          }
+        ],
+        "MinSize": 0
+      },
+      {
+        "Prefabs": [
+          {
+            "Name": "SmallBuilding",
+            "Rotation": 0
+          }
+        ],
+        "DecayedPrefabs": [
+          {
+            "Name": "SmallBuildingDecayed",
+            "Rotation": 0
+          }
+        ],
+        "MinSize": 20
+      },
+      {
+        "Prefabs": [
+          {
+            "Name": "MediumBuilding",
+            "Rotation": 0
+          }
+        ],
+        "DecayedPrefabs": [
+          {
+            "Name": "MediumBuildingDecayed",
+            "Rotation": 0
+          }
+        ],
+        "MinSize": 20
+      },
+      {
+        "Prefabs": [
+          {
+            "Name": "LargeBuilding",
+            "Rotation": 0
+          }
+        ],
+        "DecayedPrefabs": [
+          {
+            "Name": "LargeBuildingDecayed",
+            "Rotation": 0
+          }
+        ],
+        "MinSize": 30
+      }
+    ],
+    "Vehicles": [
+      {
+        "Name": "Car",
+        "PrefabNames": [
+          "Car"
+        ],
+        "MinSize": 0,
+        "Speed": 15
+      },
+      {
+        "Name": "Truck",
+        "PrefabNames": [
+          "Truck"
+        ],
+        "MinSize": 500,
+        "Speed": 10
+      }
+    ],
+    "Grass": "GrassTile",
+    "DestroyedTiles": {
+      "RandomTiles": [
+        "GrassTile"
+      ],
+      "Fx": "Destroy_FX"
+    },
+    "LayerEffects": [
+      {
+        "PrefabName": "Fire_FX",
+        "Threshold": 0.9
+      },
+      {
+        "PrefabName": "Smoke_FX",
+        "Threshold": 0.8
+      }
+    ],
+    "Chaos": {
+      "TankPrefab": "Tank",
+      "PlanePrefab": "Plane",
+      "BombPrefab": "Bomb",
+      "ExplosionPrefab": "Explosion_FX"
+    },
+    "Roads": {
+      "RoadStraight": "Road",
+      "RoadTSection": "Road",
+      "RoadIntersection": "Road",
+      "RoadCorner": "Road"
+    }
+  }
+}

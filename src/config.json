@@ -1,0 +1,234 @@
+{
+  "Api": {
+    "BaseUrl": "",
+    "EventHubEndpoint": "/hubs/cloudstack/game",
+    "GameEndpoint": "/v1/cloudstack/game"
+  },
+  "Chaos": {
+    "Enabled": true,
+    "PlaneEnabled": true,
+    "TankEnabled": true,
+    "MinimumBuildings": 2
+  },
+  "Grid": {
+    "TilesPerStreet": 50
+  },
+  "Layers": {
+    "Enabled": true
+  },
+  "Teams": {
+    "Enabled": true
+  },
+  "AssetBundle": {
+    "Name": "paid",
+    "BuildingDecayAgeThreshold": 100,
+    "StagingBuildingPrefab": "Construction",
+    "Buildings": [
+      {
+        "Prefabs": [
+          {
+            "Name": "Building_Garage_A",
+            "Rotation": 90
+          }
+        ],
+        "DecayedPrefabs": [
+          {
+            "Name": "Building_Garage_Decayed",
+            "Rotation": 90
+          }
+        ],
+        "MinSize": 0
+      },
+      {
+        "Prefabs": [
+          {
+            "Name": "Building_Shop_1_A",
+            "Rotation": 90
+          }
+        ],
+        "DecayedPrefabs": [
+          {
+            "Name": "Building_Shop_1_A_Decayed",
+            "Rotation": 90
+          }
+        ],
+        "MinSize": 10
+      },
+      {
+        "Prefabs": [
+          {
+            "Name": "Building_Shop_2_A",
+            "Rotation": 90
+          }
+        ],
+        "DecayedPrefabs": [
+          {
+            "Name": "Building_Shop_2_A_Decayed",
+            "Rotation": 90
+          }
+        ],
+        "MinSize": 15
+      },
+      {
+        "Prefabs": [
+          {
+            "Name": "Building_OldSmall_A",
+            "Rotation": 90
+          },
+          {
+            "Name": "Building_OldSmall_B",
+            "Rotation": 90
+          }
+        ],
+        "DecayedPrefabs": [
+          {
+            "Name": "Building_OldSmall_01_Decayed",
+            "Rotation": 90
+          },
+          {
+            "Name": "Building_OldSmall_02_Decayed",
+            "Rotation": 90
+          }
+        ],
+        "MinSize": 20
+      },
+      {
+        "Prefabs": [
+          {
+            "Name": "SA_Bld_OfficeOld_Clean_01",
+            "Rotation": 0
+          },
+          {
+            "Name": "SA_Bld_OfficeOld_Clean_02",
+            "Rotation": 0
+          },
+          {
+            "Name": "SA_Bld_OfficeOld_Clean_03",
+            "Rotation": 0
+          }
+        ],
+        "DecayedPrefabs": [
+          {
+            "Name": "SA_Bld_OfficeOld_01",
+            "Rotation": 0
+          },
+          {
+            "Name": "SA_Bld_OfficeOld_02",
+            "Rotation": 0
+          },
+          {
+            "Name": "SA_Bld_OfficeOld_03",
+            "Rotation": 0
+          }
+        ],
+        "MinSize": 40
+      }
+    ],
+    "Vehicles": [
+      {
+        "Name": "Scooter",
+        "PrefabNames": [
+          "Vehicle_Bike_Scooter_Red",
+          "Vehicle_Bike_Scooter_Blue",
+          "Vehicle_Bike_Scooter_Green",
+          "Vehicle_Bike_Scooter_Orange"
+        ],
+        "MinSize": 0,
+        "Speed": 15
+      },
+      {
+        "Name": "CarSmall",
+        "PrefabNames": [
+          "Vehicle_Car_Small_Yellow",
+          "Vehicle_Car_Small_Blue",
+          "Vehicle_Car_Small_Dark",
+          "Vehicle_Car_Small_Red",
+          "Vehicle_Car_Small_White"
+        ],
+        "MinSize": 250,
+        "Speed": 10
+      },
+      {
+        "Name": "CarLarge",
+        "PrefabNames": [
+          "Vehicle_Car_Large_Dark",
+          "Vehicle_Car_Large_LightBlue",
+          "Vehicle_Car_Large_Red",
+          "Vehicle_Car_Large_White"
+        ],
+        "MinSize": 400,
+        "Speed": 10
+      },
+      {
+        "Name": "CarPickup",
+        "PrefabNames": [
+          "Vehicle_Car_Truck_White",
+          "Vehicle_Car_Truck_Red",
+          "Vehicle_Car_Truck_LightBlue",
+          "Vehicle_Car_Truck_DarkBlue"
+        ],
+        "MinSize": 650,
+        "Speed": 10
+      },
+      {
+        "Name": "Van",
+        "PrefabNames": [
+          "Vehicle_Car_Van_Green",
+          "Vehicle_Car_Van_Blue",
+          "Vehicle_Car_Van_White"
+        ],
+        "MinSize": 850,
+        "Speed": 10
+      },
+      {
+        "Name": "Bus",
+        "PrefabNames": [
+          "Vehicle_Car_Bus_White",
+          "Vehicle_Car_Bus_Yellow",
+          "Vehicle_Car_Bus_Green"
+        ],
+        "MinSize": 1000,
+        "Speed": 10
+      },
+      {
+        "Name": "Truck",
+        "PrefabNames": [
+          "Vehicle_Car_CargoTruck"
+        ],
+        "MinSize": 1250,
+        "Speed": 10
+      }
+    ],
+    "Grass": "Tile_Grass",
+    "DestroyedTiles": {
+      "RandomTiles": [
+        "Tile_Grass_Destroyed1",
+        "Tile_Grass_Destroyed2",
+        "Tile_Grass_Destroyed3"
+      ],
+      "Fx": "FX_Explosion_Rubble"
+    },
+    "LayerEffects": [
+      {
+        "PrefabName": "FX_Fire",
+        "Threshold": 0.9
+      },
+      {
+        "PrefabName": "FX_Smoke",
+        "Threshold": 0.8
+      }
+    ],
+    "Chaos": {
+      "TankPrefab": "SA_Veh_Tank",
+      "PlanePrefab": "Vehicle_Plane_Propellor_Yellow",
+      "BombPrefab": "Bomb",
+      "ExplosionPrefab": "FX_Explosion_Rubble"
+    },
+    "Roads": {
+      "RoadStraight": "CarRoad_Dirt_Straight",
+      "RoadTSection": "CarRoad_Dirt_TSection",
+      "RoadIntersection": "CarRoad_Dirt_Intersection",
+      "RoadCorner": "CarRoad_Dirt_Corner"
+    }
+  }
+}
