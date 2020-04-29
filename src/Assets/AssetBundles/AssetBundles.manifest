@@ -1,12 +1,10 @@
 ManifestFileVersion: 0
-CRC: 1152191561
+CRC: 670443933
 AssetBundleManifest:
   AssetBundleInfos:
     Info_0:
       Name: free
-      Dependencies:
-        Dependency_0: paid
+      Dependencies: {}
     Info_1:
       Name: paid
-      Dependencies:
-        Dependency_0: free
+      Dependencies: {}
