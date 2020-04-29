@@ -1,7 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.IO;
 using Assets.Scripts.Models.Settings;
 using Assets.Scripts.Utils;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Networking;
@@ -19,11 +21,16 @@ namespace Assets.Scripts.Managers
 		public UnityEvent SettingsLoadedEvent = new UnityEvent();
 		public SettingsModel Settings { get; private set; } = new SettingsModel();
 
+		public GameObject AlertCanvas;
+
+		private TMP_Text _alertText;
+
 		/// <summary>
 		/// Read the settings on awake state.
 		/// </summary>
 		void Start()
 		{
+			_alertText = AlertCanvas.GetComponentInChildren<TMP_Text>();
 			const string configFileName = "config.json";
 
 			//Read our config file. If WebGL we actually need to do a web request
@@ -33,10 +40,23 @@ namespace Assets.Scripts.Managers
 			}
 			else
 			{
-				StreamReader reader = new StreamReader(configFileName);
-				Settings = JsonUtility.FromJson<SettingsModel>(reader.ReadToEnd());
-				Debug.Log("Settings loaded");
-				SettingsLoadedEvent?.Invoke();
+				try
+				{
+					StreamReader reader = new StreamReader(configFileName);
+					Settings = JsonUtility.FromJson<SettingsModel>(reader.ReadToEnd());
+					Debug.Log("Settings loaded");
+					SettingsLoadedEvent?.Invoke();
+				}
+				catch (ArgumentException)
+				{
+					_alertText.text = $"Failed loading the configuration.\r\nInvalid configuration file.";
+					AlertCanvas.SetActive(true);
+				}
+				catch (FileNotFoundException)
+				{
+					_alertText.text = $"Failed loading the configuration.\r\nMissing configuration file.";
+					AlertCanvas.SetActive(true);
+				}
 			}
 		}
 
@@ -54,6 +74,8 @@ namespace Assets.Scripts.Managers
 				if (webRequest.isNetworkError || webRequest.isHttpError)
 				{
 					Debug.LogError($"Retrieving config failed");
+					_alertText.text = "Failed loading the configuration.\r\nMissing configuration file";
+					AlertCanvas.SetActive(true);
 				}
 				else
 				{

@@ -110,7 +110,7 @@ namespace Assets.Scripts.Managers
 				Material m = (Material) o;
 				string shaderName = m.shader.name;
 				Shader newShader = Shader.Find(shaderName);
-				
+
 				if (newShader != null)
 				{
 					m.shader = newShader;
@@ -119,6 +119,7 @@ namespace Assets.Scripts.Managers
 				{
 					Debug.LogWarning("unable to refresh shader: " + shaderName + " in material " + m.name);
 				}
+
 				_materialCacheDictionary.Add(m.name.Split(' ')[0], m);
 			}
 		}
@@ -146,6 +147,7 @@ namespace Assets.Scripts.Managers
 					{
 						prefab = buildingPrefab.DecayedPrefabs.PickRandom();
 					}
+
 					g = GetPrefab(prefab.Name);
 					return new Tuple<GameObject, float>(g, prefab.Rotation);
 				}

@@ -24,7 +24,7 @@ namespace Assets.Scripts.Managers
 		// Cols is a solid 50
 		public int Cols { get; private set; } = 50;
 
-		public readonly int TileSize = 10;
+		public const int TileSize = 10;
 
 		// The actual grid which may be used through different managers
 		public readonly Dictionary<Tile, TileObject> Grid = new Dictionary<Tile, TileObject>();
@@ -219,32 +219,63 @@ namespace Assets.Scripts.Managers
 				return;
 			}
 
-			List<IVisualizedObject> visualizedObjects =
-				neighbourhoodModel.VisualizedObjects
-					.Where(x => x is VisualizedBuildingModel || x is VisualizedStagingBuildingModel).ToList();
+			List<IVisualizedBuilding> visualizedObjects =
+				neighbourhoodModel.VisualizedObjects.OfType<IVisualizedBuilding>().ToList();
 
-			int tileCount = visualizedObjects.Count + 1;
+			int tileCount = GetTotalTilesRequired(visualizedObjects, neighbourhoodModel.Age) + 1;
+
 			List<Tile> tiles = FindTiles(tileCount);
 			if (tiles.Count != tileCount)
 			{
-				Debug.LogError("Building block went wrong. Not enough tiles!");
+				Debug.LogError(
+					"Building block went wrong. Not enough tiles!\r\nIncrease the TilesPerStreet in the config.json");
 				return;
 			}
 
+			float spawnOffsetX = 0;
+			int tileIndex = 0;
 			for (int index = 0; index < visualizedObjects.Count; index++)
 			{
-				Tile tile = tiles[index];
+				Tile tile = tiles[tileIndex];
 				if (Grid[tile] != null && Grid[tile].GameObject != null)
 					Destroy(Grid[tile].GameObject);
 
 				GameObject building = SpawnBuilding(tile, visualizedObjects[index].Size, neighbourhoodModel.Age,
 					neighbourhoodModel, visualizedObjects[index] is VisualizedStagingBuildingModel);
+				Grid[tile] = new TileObject
+					{GameObject = building, ObjectType = ObjectType.Building};
+				tileIndex++;
+
+				int tilesRequired = GetTilesRequiredForBuilding(building);
+
+				// Check if we need more than 1 tile for this building
+				if (tilesRequired > 1)
+				{
+					int largestTiles = tilesRequired * TileSize;
+					RaycastHit hit;
+					if (Physics.Raycast(building.transform.position, Vector3.left, out hit, 5))
+					{
+						// Check if there is grass next to us and at the distance so we can allign our building
+						if (hit.transform.gameObject.CompareTag("Grass"))
+							spawnOffsetX += hit.distance;
+					}
+
+					building.transform.position = new Vector3(building.transform.position.x + spawnOffsetX,
+						building.transform.position.y, building.transform.position.z);
+					for (int i = 1; i < tilesRequired; i++)
+					{
+						Tile tile2 = tiles[tileIndex];
+						if (Grid[tile2] != null && !Grid[tile2].GameObject.Equals(building))
+							Destroy(Grid[tile2].GameObject);
+						Grid[tile2] = new TileObject
+							{GameObject = building, ObjectType = ObjectType.Building};
+						tileIndex++;
+					}
+				}
 
 				neighbourhoodModel
 					.VisualizedObjects[neighbourhoodModel.VisualizedObjects.IndexOf(visualizedObjects[index])]
 					.GameObject = building;
-				Grid[tile] = new TileObject
-					{GameObject = building, ObjectType = ObjectType.Building};
 			}
 
 			GameObject grassPatch = Instantiate(
@@ -294,17 +325,21 @@ namespace Assets.Scripts.Managers
 		/// <param name="destroyEffect">Set this to true if you want the building to disappear with a nice effect</param>
 		public void DestroyBuilding(IVisualizedBuilding visualizedObject, bool destroyEffect = true)
 		{
-			if (visualizedObject.GameObject == null || !(visualizedObject is IVisualizedBuilding)) return;
+			if (visualizedObject.GameObject == null) return;
 
-			KeyValuePair<Tile, TileObject> gridObj = Grid.SingleOrDefault(t =>
+			List<KeyValuePair<Tile, TileObject>> gridObjects = Grid.Where(t =>
 				t.Value != null && t.Value.GameObject != null &&
-				t.Value.GameObject == visualizedObject.GameObject);
-			if (visualizedObject is VisualizedStagingBuildingModel || !destroyEffect)
-				Destroy(visualizedObject.GameObject);
-			else
-				visualizedObject.GameObject.AddComponent<DestroyGridTile>().Tile = gridObj.Key;
+				t.Value.GameObject.Equals(visualizedObject.GameObject)).ToList();
 
-			Grid[gridObj.Key] = null;
+			foreach (KeyValuePair<Tile, TileObject> gridObject in gridObjects)
+			{
+				if (visualizedObject is VisualizedStagingBuildingModel || !destroyEffect)
+					Destroy(visualizedObject.GameObject);
+				else
+					visualizedObject.GameObject.AddComponent<DestroyGridTile>().Tile = gridObject.Key;
+
+				Grid[gridObject.Key] = null;
+			}
 		}
 
 		/// <summary>
@@ -319,16 +354,21 @@ namespace Assets.Scripts.Managers
 			{
 				if (visualizedObject.GameObject == null) continue;
 
-				KeyValuePair<Tile, TileObject> grid = Grid.SingleOrDefault(x =>
+				// Find all grid objects that equal to the visualized object
+				List<KeyValuePair<Tile, TileObject>> gridObjects = Grid.Where(x =>
 					x.Value != null && x.Value.GameObject != null &&
-					x.Value.GameObject == visualizedObject.GameObject);
-				if (destroyEffect)
-					visualizedObject.GameObject.AddComponent<DestroyGridTile>().Tile = grid.Key;
-				else
+					x.Value.GameObject.Equals(visualizedObject.GameObject)).ToList();
+
+				foreach (KeyValuePair<Tile, TileObject> gridObject in gridObjects)
 				{
-					Destroy(visualizedObject.GameObject);
-					visualizedObject.GameObject = null;
-					Grid[grid.Key] = null;
+					if (destroyEffect)
+						visualizedObject.GameObject.AddComponent<DestroyGridTile>().Tile = gridObject.Key;
+					else
+					{
+						Destroy(visualizedObject.GameObject);
+						visualizedObject.GameObject = null;
+						Grid[gridObject.Key] = null;
+					}
 				}
 
 				// Remove all grass tiles from a neighbourhood that is being destroyed
@@ -351,12 +391,10 @@ namespace Assets.Scripts.Managers
 		/// <returns></returns>
 		private List<Tile> FindTiles(int tiles)
 		{
-			int tries = 0;
 			int currentZIndex = 0;
 			List<Tile> foundTiles = new List<Tile>();
 			while (currentZIndex <= Cols)
 			{
-				tries++;
 				foreach (KeyValuePair<Tile, TileObject> tile in Grid.Where(tile =>
 					tile.Key.Z == currentZIndex * TileSize))
 				{
@@ -375,12 +413,11 @@ namespace Assets.Scripts.Managers
 				// Nothing found, lets go to the next Z index
 				currentZIndex++;
 			}
-
-			Debug.LogError("Failed tiles");
-
+#if UNITY_EDITOR
+			Debug.LogError("Failed finding empty tiles");
+#endif
 			return foundTiles;
 		}
-
 
 		/// <summary>
 		/// This function removes destroyed grass tiles from the game when calculating new tiles for a new building block
@@ -397,7 +434,49 @@ namespace Assets.Scripts.Managers
 				}
 			}
 		}
-	}
 
-	#endregion
+		public int GetTotalTilesRequired(IEnumerable<IVisualizedBuilding> buildings, int age)
+		{
+			const int threshold = 1;
+			int tiles = 0;
+			foreach (IVisualizedBuilding building in buildings)
+			{
+				Tuple<GameObject, float> b = AssetsManager.Instance.GetBuildingPrefab(building.Size, age);
+				Vector3 sizeBounds = b.Item1.GetComponent<MeshFilter>().sharedMesh.bounds.size;
+				for (int i = 1; i < sizeBounds.x; i++)
+				{
+					if (i % (TileSize + threshold) == 0)
+						tiles++;
+				}
+
+				tiles++;
+			}
+
+			return tiles;
+		}
+
+		public int GetTilesRequiredForBuilding(GameObject building)
+		{
+			const int threshold = 1;
+			int tiles = 0;
+
+			Vector3 sizeBounds = building.GetComponent<MeshFilter>().sharedMesh.bounds.size;
+			if (sizeBounds.x > 11)
+			{
+				Debug.Log(sizeBounds.x);
+			}
+
+			for (int i = 1; i < sizeBounds.x; i++)
+			{
+				if (i % (TileSize + threshold) == 0)
+					tiles++;
+			}
+
+			tiles++;
+			Debug.Log(tiles);
+			return tiles;
+		}
+
+		#endregion
+	}
 }

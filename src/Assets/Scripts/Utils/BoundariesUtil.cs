@@ -28,8 +28,8 @@ namespace Assets.Scripts.Utils
 		/// </summary>
 		public static Tuple<int, int> CalculateMaxGridBoundaries(GridManager gridManager)
 		{
-			int maxX = gridManager.Cols * gridManager.TileSize;
-			int maxZ = gridManager.Rows * gridManager.TileSize;
+			int maxX = gridManager.Cols * GridManager.TileSize;
+			int maxZ = gridManager.Rows * GridManager.TileSize;
 
 			return new Tuple<int, int>(maxX, maxZ);
 		}
