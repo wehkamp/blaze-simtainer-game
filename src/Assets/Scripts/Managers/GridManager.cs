@@ -437,19 +437,11 @@ namespace Assets.Scripts.Managers
 
 		public int GetTotalTilesRequired(IEnumerable<IVisualizedBuilding> buildings, int age)
 		{
-			const int threshold = 1;
 			int tiles = 0;
 			foreach (IVisualizedBuilding building in buildings)
 			{
 				Tuple<GameObject, float> b = AssetsManager.Instance.GetBuildingPrefab(building.Size, age);
-				Vector3 sizeBounds = b.Item1.GetComponent<MeshFilter>().sharedMesh.bounds.size;
-				for (int i = 1; i < sizeBounds.x; i++)
-				{
-					if (i % (TileSize + threshold) == 0)
-						tiles++;
-				}
-
-				tiles++;
+				tiles += GetTilesRequiredForBuilding(b.Item1);
 			}
 
 			return tiles;
@@ -461,10 +453,6 @@ namespace Assets.Scripts.Managers
 			int tiles = 0;
 
 			Vector3 sizeBounds = building.GetComponent<MeshFilter>().sharedMesh.bounds.size;
-			if (sizeBounds.x > 11)
-			{
-				Debug.Log(sizeBounds.x);
-			}
 
 			for (int i = 1; i < sizeBounds.x; i++)
 			{
@@ -473,7 +461,6 @@ namespace Assets.Scripts.Managers
 			}
 
 			tiles++;
-			Debug.Log(tiles);
 			return tiles;
 		}
 

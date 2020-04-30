@@ -48,6 +48,9 @@ namespace Assets.Scripts.Managers
 			_alertText = AlertCanvas.GetComponentInChildren<TMP_Text>();
 		}
 
+		/// <summary>
+		/// Start loading the API data as soon as the assets are loaded.
+		/// </summary>
 		private void LoadApiData()
 		{
 			Debug.Log("Loading API data");
@@ -59,6 +62,9 @@ namespace Assets.Scripts.Managers
 			AlertCanvas.SetActive(false);
 		}
 
+		/// <summary>
+		/// Try to start the SignalR connection with the server.
+		/// </summary>
 		private void StartSignalR()
 		{
 			if (string.IsNullOrEmpty(SettingsManager.Instance.Settings.Api.EventHubEndpoint))
@@ -97,7 +103,7 @@ namespace Assets.Scripts.Managers
 		}
 
 		/// <summary>
-		/// Function to kill a object through the API
+		/// Function to kill a object through the API.
 		/// </summary>
 		/// <returns></returns>
 		public IEnumerator KillVisualizedObject(IVisualizedObject building, bool force = false)
@@ -120,7 +126,7 @@ namespace Assets.Scripts.Managers
 		}
 
 		/// <summary>
-		/// Function to load the first data from the API
+		/// Function to load the first data from the API.
 		/// </summary>
 		/// <returns></returns>
 		private IEnumerator LoadDataFromApi()
@@ -154,6 +160,9 @@ namespace Assets.Scripts.Managers
 			yield return null;
 		}
 
+		/// <summary>
+		/// Kill the connection with SignalR when the API manager is being destroyed.
+		/// </summary>
 		void OnDestroy()
 		{
 			if (_srLib == null) return;

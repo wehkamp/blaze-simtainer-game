@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Assets.Scripts.Managers;
-using Assets.Scripts.Models;
 using Assets.Scripts.Utils;
 using UnityEngine;
 using Random = UnityEngine.Random;

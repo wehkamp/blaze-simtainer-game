@@ -18,15 +18,16 @@ namespace Assets.Scripts.Components
 
 		public GameObject Image;
 
-		// String represents the name of the vehicle's prefab
+		// String represents the name of the vehicle (e.g. Truck)
 		private readonly Dictionary<string, TrafficSprite> _trafficCount =
 			new Dictionary<string, TrafficSprite>();
 
-		private float _widthDeltaX = 0f;
+		private float _widthDeltaX;
 
+		// We do not use a struct here since we want to change the count on-the-fly
 		private class TrafficSprite
 		{
-			public GameObject Obj { get; set; }
+			public GameObject VehicleGameObject { get; set; }
 			public int Count { get; set; }
 		}
 
@@ -54,28 +55,47 @@ namespace Assets.Scripts.Components
 					rt.localPosition.z);
 
 				_widthDeltaX += 80f;
-				_trafficCount.Add(vehicle.Name, new TrafficSprite {Obj = g, Count = 0});
+				_trafficCount.Add(vehicle.Name, new TrafficSprite {VehicleGameObject = g, Count = 0});
 			}
 
 			TrafficManager.Instance.TrafficUpdateEvent.AddListener(UpdateCounters);
 			TeamManager.Instance.TeamSelectionChangedEvent.AddListener(UpdateCounters);
 		}
 
+		/// <summary>
+		/// Function to update all the counters in the bottom panel.
+		/// Only is called when the team is changed or the traffic manager received an update.
+		/// </summary>
 		private void UpdateCounters()
 		{
 			IEnumerable<TrafficManager.Vehicle> vehicles = TrafficManager.Instance.Vehicles;
+
+			// Reset all counters to 0
 			ResetAllCounters();
+
+			// Check if a team is selected, if so we want to filter all traffic for the selected team
 			if (TeamManager.Instance.SelectedTeam != null)
 			{
-				vehicles = vehicles.Where(x => x.neighbourhoodModel.Team == TeamManager.Instance.SelectedTeam);
+				vehicles = vehicles.Where(x => x.NeighbourhoodModel.Team == TeamManager.Instance.SelectedTeam);
 			}
 
+			// First count all vehicles by their name
 			foreach (TrafficManager.Vehicle vehicle in vehicles)
 			{
-				IncrementText(_trafficCount[vehicle.defaultPrefabName]);
+				_trafficCount[vehicle.VehicleName].Count++;
+			}
+
+			// Now set the right text
+			foreach (KeyValuePair<string, TrafficSprite> kv in _trafficCount)
+			{
+				kv.Value.VehicleGameObject.GetComponentInChildren<TMP_Text>().text =
+					kv.Value.Count.ToString();
 			}
 		}
 
+		/// <summary>
+		/// Function to reset all the counters to 0
+		/// </summary>
 		private void ResetAllCounters()
 		{
 			foreach (KeyValuePair<string, TrafficSprite> kv in _trafficCount)
@@ -84,16 +104,14 @@ namespace Assets.Scripts.Components
 			}
 		}
 
+		/// <summary>
+		/// Function to reset the count to 0 for a traffic sprite
+		/// </summary>
+		/// <param name="trafficSprite"></param>
 		private static void ResetCounter(TrafficSprite trafficSprite)
 		{
 			trafficSprite.Count = 0;
-			trafficSprite.Obj.GetComponentInChildren<TMP_Text>().text = trafficSprite.Count.ToString();
-		}
-
-		private static void IncrementText(TrafficSprite trafficSprite)
-		{
-			trafficSprite.Count++;
-			trafficSprite.Obj.GetComponentInChildren<TMP_Text>().text = trafficSprite.Count.ToString();
+			trafficSprite.VehicleGameObject.GetComponentInChildren<TMP_Text>().text = trafficSprite.Count.ToString();
 		}
 	}
 }

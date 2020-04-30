@@ -2,7 +2,6 @@
 using System.Collections;
 using Assets.Scripts.Interfaces;
 using Assets.Scripts.Managers;
-using Assets.Scripts.Models;
 using Assets.Scripts.Utils;
 using UnityEngine;
 using UnityEngine.AI;
@@ -70,6 +69,9 @@ namespace Assets.Scripts.Components.Navigators
 			}
 		}
 
+		/// <summary>
+		/// Function to destroy a building
+		/// </summary>
 		private void Fire()
 		{
 			if (!_rotating)
@@ -92,11 +94,15 @@ namespace Assets.Scripts.Components.Navigators
 			}
 		}
 
-		IEnumerator Rotate(float targetRotationY)
+		/// <summary>
+		/// Function to rotate the tank turret to the angle the target is
+		/// </summary>
+		/// <param name="targetRotationY"></param>
+		/// <returns></returns>
+		private IEnumerator Rotate(float targetRotationY)
 		{
 			_rotating = true;
 			float startRotation = _turret.transform.eulerAngles.y;
-			float endRotation = startRotation + 360.0f;
 			float t = 0.0f;
 			while (Math.Abs(_turret.gameObject.transform.rotation.eulerAngles.y - targetRotationY) > 0.1f)
 			{

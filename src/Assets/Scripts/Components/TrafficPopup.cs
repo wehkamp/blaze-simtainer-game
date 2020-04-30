@@ -48,19 +48,19 @@ namespace Assets.Scripts.Components
 		private void UpdatePopup()
 		{
 			IEnumerable<TrafficManager.Vehicle> vehicles = TrafficManager.Instance.Vehicles.OrderBy(x =>
-				x.neighbourhoodModel.Name).Where(x => x.vehicleModel.Size > 0);
+				x.NeighbourhoodModel.Name).Where(x => x.VehicleModel.Size > 0);
 			if (TeamManager.Instance.SelectedTeam != null)
 			{
 				ResetRows();
-				vehicles = vehicles.Where(x => x.neighbourhoodModel.Team == TeamManager.Instance.SelectedTeam);
+				vehicles = vehicles.Where(x => x.NeighbourhoodModel.Team == TeamManager.Instance.SelectedTeam);
 			}
 
 			foreach (TrafficManager.Vehicle vehicle in vehicles)
 			{
-				if (vehicle.gameObject != null)
+				if (vehicle.VehicleGameObject != null)
 				{
-					AddRow(AssetsManager.Instance.GetVehicleSpritesByType(vehicle.defaultPrefabName), vehicle.neighbourhoodModel.Name, vehicle.vehicleModel,
-						vehicle.gameObject);
+					AddRow(AssetsManager.Instance.GetVehicleSpritesByType(vehicle.VehicleName), vehicle.NeighbourhoodModel.Name, vehicle.VehicleModel,
+						vehicle.VehicleGameObject);
 				}
 			}
 		}

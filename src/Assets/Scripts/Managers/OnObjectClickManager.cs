@@ -184,14 +184,14 @@ namespace Assets.Scripts.Managers
 				else
 				{
 					TrafficManager.Vehicle v =
-						TrafficManager.Instance.Vehicles.Single(x => x.gameObject == clickedObject);
+						TrafficManager.Instance.Vehicles.Single(x => x.VehicleGameObject == clickedObject);
 
 					// Check if vehicle is visible
 					if (clickedObject.GetComponentsInChildren<Renderer>().Any(x => !x.enabled)) return;
 
-					infoText = v.neighbourhoodModel == null
+					infoText = v.NeighbourhoodModel == null
 						? "Vehicle driving towards deleted neighbourhood"
-						: $"Vehicle driving towards {v.neighbourhoodModel.Name}";
+						: $"Vehicle driving towards {v.NeighbourhoodModel.Name}";
 				}
 
 				InfoPanel.GetComponentInChildren<TMP_Text>().text = infoText;
