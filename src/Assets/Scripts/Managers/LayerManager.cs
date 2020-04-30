@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Assets.Scripts.Components.Effects;
@@ -20,9 +19,7 @@ namespace Assets.Scripts.Managers
 		public GameObject LayerSettingsPanel;
 		public VisualLayerModel SelectedLayer;
 
-		[Range(0, 1)] public float FireEffectThreshold = 0.9f;
-		[Range(0, 1)] public float SmokeEffectThreshold = 0.8f;
-
+		// List with objects that are used for a selected layer
 		private readonly List<GameObject> _selectedLayerObjects =
 			new List<GameObject>();
 

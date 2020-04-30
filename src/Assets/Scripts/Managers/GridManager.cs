@@ -222,6 +222,7 @@ namespace Assets.Scripts.Managers
 			List<IVisualizedBuilding> visualizedObjects =
 				neighbourhoodModel.VisualizedObjects.OfType<IVisualizedBuilding>().ToList();
 
+			// Calculate total tile count we need to spawn this building (if building is wider than the TileSize)
 			int tileCount = GetTotalTilesRequired(visualizedObjects, neighbourhoodModel.Age) + 1;
 
 			List<Tile> tiles = FindTiles(tileCount);
@@ -246,14 +247,13 @@ namespace Assets.Scripts.Managers
 					{GameObject = building, ObjectType = ObjectType.Building};
 				tileIndex++;
 
+				// Check how many tiles we need to spawsn this building
 				int tilesRequired = GetTilesRequiredForBuilding(building);
 
 				// Check if we need more than 1 tile for this building
 				if (tilesRequired > 1)
 				{
-					int largestTiles = tilesRequired * TileSize;
-					RaycastHit hit;
-					if (Physics.Raycast(building.transform.position, Vector3.left, out hit, 5))
+					if (Physics.Raycast(building.transform.position, Vector3.left, out RaycastHit hit, 5))
 					{
 						// Check if there is grass next to us and at the distance so we can allign our building
 						if (hit.transform.gameObject.CompareTag("Grass"))
@@ -435,6 +435,12 @@ namespace Assets.Scripts.Managers
 			}
 		}
 
+		/// <summary>
+		/// Function to calculate how many tiles are needed for an amount of buildings.
+		/// </summary>
+		/// <param name="buildings"></param>
+		/// <param name="age"></param>
+		/// <returns></returns>
 		public int GetTotalTilesRequired(IEnumerable<IVisualizedBuilding> buildings, int age)
 		{
 			int tiles = 0;
@@ -447,6 +453,11 @@ namespace Assets.Scripts.Managers
 			return tiles;
 		}
 
+		/// <summary>
+		/// Function to calculate the tiles that are required for placing a building.
+		/// </summary>
+		/// <param name="building"></param>
+		/// <returns></returns>
 		public int GetTilesRequiredForBuilding(GameObject building)
 		{
 			const int threshold = 1;
