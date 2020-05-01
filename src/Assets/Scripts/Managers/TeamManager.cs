@@ -66,9 +66,9 @@ namespace Assets.Scripts.Managers
 		{
 			if (SelectedTeam != null)
 			{
-				if (vehicle.neighbourhoodModel.Team != SelectedTeam)
+				if (vehicle.NeighbourhoodModel.Team != SelectedTeam)
 				{
-					SetMaterials(vehicle.gameObject, true);
+					SetMaterials(vehicle.VehicleGameObject, true);
 				}
 			}
 		}

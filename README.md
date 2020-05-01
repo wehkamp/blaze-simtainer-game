@@ -1,11 +1,11 @@
 # SimTainer
 
-A game to visualize the cloud stack of wehkamp real-time with elements of resource management and chaos engineering!
+A game to visualize the cloud stack of wehkamp real-time with elements of resource management and chaos engineering! Open sourced, so you can try to set it up for your own environment. 
 
 Every building in the image below represents a container and every vehicle driving around network traffic.
 
-The information is provider by a back-end which is set-up so generic as possible, so you can visualize other things as well.
-For the back-end in the example: Marathon, Mesos and Prometheus is used.
+The information is provider by a back-end which is set-up as generic as possible, so you can visualize other things as well.
+For the back-end in the example: Marathon, Mesos and Prometheus are used.
 
 Back-end project can be found here: <https://github.com/wehkamp/blaze-simtainer-service>
 
@@ -13,9 +13,10 @@ Back-end project can be found here: <https://github.com/wehkamp/blaze-simtainer-
 
 ## 1. Getting started
 
-Before you proceed: **This game is still a work in progress. If you found any bug, please let us know and create an issue**
+Before you proceed: **This game is still a work in progress. If you find any bug, please let us know and create an issue**
 
 The open-source version is without the assets you see in the picture above. This version has own created prefabs which are created within an hour to strip the assets (I'm not a 3D artist unfortunately), which are not quite nice. You can of course download a free asset pack, but it's not allowed to include these in this repo.
+
 These assets are not complete! So there is no scooter, car, van etc. Only a car, plane, tank and a bus.
 The code base is the same as the one with the paid assets version.
 
@@ -49,9 +50,10 @@ If you want to use these assets, read chapter 5.1
 
 ### 1.3 Used libraries
 
-SignalR support for WebGL (included) - <https://github.com/evanlindsey/Unity-WebGL-SignalR>
-SimpleJSON (included) - <https://wiki.unity3d.com/index.php/SimpleJSON>
-UnityRuntimePreviewGenerator (included) - <https://github.com/yasirkula/UnityRuntimePreviewGenerator>
+* SignalR support for WebGL (included) - <https://github.com/evanlindsey/Unity-WebGL-SignalR>
+* SimpleJSON (included) - <https://wiki.unity3d.com/index.php/SimpleJSON>
+* UnityRuntimePreviewGenerator (included) - <https://github.com/yasirkula/UnityRuntimePreviewGenerator>
+* NavMeshComponents (included) - <https://github.com/Unity-Technologies/NavMeshComponents>
 
 ### 1.4 Controls
 
@@ -82,11 +84,10 @@ This will mean you only need to make a pack of assets, edit the game config file
 
 No need to modify/compile the game yourself.
 
-
 ### Assets
 
 To build the assets bundle, read chapter 5.1.
-When you don not make use of WebGL, place the AssetBundle in the Data folder <https://docs.unity3d.com/ScriptReference/Application-dataPath.html> of the game.
+When you do not make use of WebGL, place the AssetBundle in the Data folder <https://docs.unity3d.com/ScriptReference/Application-dataPath.html> of the game.
 
 If you're using the back end we provided, rename the bundle ending with .unityweb  and edit the `config.json` and include the extension in the name of the asset bundle.
 
@@ -573,7 +574,7 @@ For performance reasons it is advised to **enable** GPU instancing for the trans
 
 ## 6. Documentation
 
-Most parts of the code is documented.
+Most of the code is documented.
 This means that if you have knowledge of Unity and C# it should be easy to make your own adjustments.
 
 **Every** manager in the game is a Singleton, all managers can reach to each others publics to retrieve information.
