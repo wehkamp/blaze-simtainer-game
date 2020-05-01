@@ -255,8 +255,8 @@ namespace Assets.Scripts.Managers
 				{
 					if (Physics.Raycast(building.transform.position, Vector3.left, out RaycastHit hit, 5))
 					{
-						// Check if there is grass next to us and at the distance so we can allign our building
-						if (hit.transform.gameObject.CompareTag("Grass"))
+						// Check if there is grass or a road next to us and at the distance so we can align our building
+						if (hit.transform.gameObject.CompareTag("Grass") || hit.transform.gameObject.CompareTag("Road"))
 							spawnOffsetX += hit.distance;
 					}
 
