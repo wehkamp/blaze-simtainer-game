@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "SimTainer"
-#define MyAppVersion "0.3b1"
+#define MyAppVersion "0.3b2"
 #define MyAppPublisher "Wehkamp"
 #define MyAppExeName "SimTainer.exe"
 

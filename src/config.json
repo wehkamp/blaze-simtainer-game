@@ -52,7 +52,7 @@
             "Rotation": 90
           }
         ],
-        "MinSize": 10
+        "MinSize": 5
       },
       {
         "Prefabs": [
@@ -64,6 +64,21 @@
         "DecayedPrefabs": [
           {
             "Name": "Building_Shop_2_A_Decayed",
+            "Rotation": 90
+          }
+        ],
+        "MinSize": 10
+      },
+      {
+        "Prefabs": [
+          {
+            "Name": "Building_Warehouse_A",
+            "Rotation": 90
+          }
+        ],
+        "DecayedPrefabs": [
+          {
+            "Name": "Building_Warehouse_A_Decayed",
             "Rotation": 90
           }
         ],
@@ -95,6 +110,36 @@
       {
         "Prefabs": [
           {
+            "Name": "Building_Shop_2_C",
+            "Rotation": 180
+          }
+        ],
+        "DecayedPrefabs": [
+          {
+            "Name": "Building_Shop_2_C_Decayed",
+            "Rotation": 180
+          }
+        ],
+        "MinSize": 30
+      },
+      {
+        "Prefabs": [
+          {
+            "Name": "Building_NewFlat_Small",
+            "Rotation": 90
+          }
+        ],
+        "DecayedPrefabs": [
+          {
+            "Name": "Building_NewFlat_Small_Decayed",
+            "Rotation": 90
+          }
+        ],
+        "MinSize": 40
+      },
+      {
+        "Prefabs": [
+          {
             "Name": "SA_Bld_OfficeOld_Clean_01",
             "Rotation": 0
           },
@@ -121,7 +166,22 @@
             "Rotation": 0
           }
         ],
-        "MinSize": 40
+        "MinSize": 80
+      },
+      {
+        "Prefabs": [
+          {
+            "Name": "Building_Bank",
+            "Rotation": 90
+          }
+        ],
+        "DecayedPrefabs": [
+          {
+            "Name": "Building_Bank_Decayed",
+            "Rotation": 90
+          }
+        ],
+        "MinSize": 120
       }
     ],
     "Vehicles": [

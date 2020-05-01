@@ -6,7 +6,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Networking;
-using UnityEngine.SceneManagement;
 
 namespace Assets.Scripts.Managers
 {
@@ -30,7 +29,9 @@ namespace Assets.Scripts.Managers
 
 		private const string HubListenerName = "SendUpdateToClients";
 		private SignalRLib _srLib;
-		[SerializeField] public TMP_Text AlertText;
+		[SerializeField] public GameObject AlertCanvas;
+
+		private TMP_Text _alertText;
 
 		[Header("LOADING SCREEN")] public GameObject LoadingMenu;
 		private string _hubEndpoint;
@@ -44,8 +45,12 @@ namespace Assets.Scripts.Managers
 			// Wait until the settings and assets are loaded, otherwise we don't know our base url and endpoints
 			AssetsManager.Instance.AssetsLoaded.AddListener(LoadApiData);
 			LoadingMenu.SetActive(true);
+			_alertText = AlertCanvas.GetComponentInChildren<TMP_Text>();
 		}
 
+		/// <summary>
+		/// Start loading the API data as soon as the assets are loaded.
+		/// </summary>
 		private void LoadApiData()
 		{
 			Debug.Log("Loading API data");
@@ -54,14 +59,18 @@ namespace Assets.Scripts.Managers
 			_hubEndpoint = SettingsManager.Instance.Settings.Api.BaseUrl +
 			               SettingsManager.Instance.Settings.Api.EventHubEndpoint;
 			StartCoroutine(LoadDataFromApi());
-			AlertText.gameObject.SetActive(false);
+			AlertCanvas.SetActive(false);
 		}
 
+		/// <summary>
+		/// Try to start the SignalR connection with the server.
+		/// </summary>
 		private void StartSignalR()
 		{
 			if (string.IsNullOrEmpty(SettingsManager.Instance.Settings.Api.EventHubEndpoint))
 			{
-				Debug.LogWarning("SignalR is not enabled, no endpoint is set.");
+				Debug.LogWarning("SignalR is not enabled, no endpoint is set. Real-time data is unavailable.");
+
 				return;
 			}
 
@@ -70,22 +79,22 @@ namespace Assets.Scripts.Managers
 
 			_srLib.Error += (sender, e) =>
 			{
-				if (!Application.isEditor)
-				{
-					AlertText.gameObject.SetActive(true);
-					AlertText.text =
-						$"Error retrieving live data from server! Server seems to be down.";
-				}
-				else
-				{
-					Debug.LogError($"SignalR gives an error: {e.Message}");
-				}
+				_alertText.text =
+					$"Error retrieving live data from server! Server seems to be down.";
+				AlertCanvas.SetActive(true);
+#if UNITY_EDITOR
+				Debug.LogError($"SignalR gives an error: {e.Message}");
+#endif
 			};
-			_srLib.ConnectionStarted += (sender, e) => { Debug.Log(e.Message); };
+			_srLib.ConnectionStarted += (sender, e) => { Debug.Log("Connection with server established."); };
 
 
 			_srLib.MessageReceived += (sender, e) =>
 			{
+				// Disable alerting text if server went back up
+				if (_alertText.gameObject.activeSelf)
+					_alertText.gameObject.SetActive(false);
+
 				UpdateEventModel updateEventModel = JsonParser.ParseUpdateEvent(e.Message);
 				if (Application.isEditor && updateEventModel.UpdatedLayerValues == null)
 					Debug.Log(e.Message);
@@ -94,7 +103,7 @@ namespace Assets.Scripts.Managers
 		}
 
 		/// <summary>
-		/// Function to kill a object through the API
+		/// Function to kill a object through the API.
 		/// </summary>
 		/// <returns></returns>
 		public IEnumerator KillVisualizedObject(IVisualizedObject building, bool force = false)
@@ -117,10 +126,10 @@ namespace Assets.Scripts.Managers
 		}
 
 		/// <summary>
-		/// Function to load the first data from the API
+		/// Function to load the first data from the API.
 		/// </summary>
 		/// <returns></returns>
-		IEnumerator LoadDataFromApi()
+		private IEnumerator LoadDataFromApi()
 		{
 			using (UnityWebRequest webRequest = UnityWebRequest.Get(_gameEndpoint))
 			{
@@ -132,13 +141,13 @@ namespace Assets.Scripts.Managers
 				if (webRequest.isNetworkError || webRequest.isHttpError)
 				{
 					Debug.LogError($"Webrequest failed! Error: {webRequest.error}");
-					AlertText.gameObject.SetActive(true);
-					AlertText.text =
-						$"Error retrieving data from API. Please connect to the VPN\r\nPress {KeyCode.Escape.ToString()} to return to the main menu";
+					_alertText.text =
+						$"Error retrieving data from API. Please connect to the VPN\r\nPress {KeyCode.Escape} to return to the main menu";
+					AlertCanvas.SetActive(true);
 				}
 				else
 				{
-					AlertText.gameObject.SetActive(false);
+					AlertCanvas.SetActive(false);
 					GameModel gameModel = JsonParser.ParseGameModel(webRequest.downloadHandler.text);
 					ApiInitializedEvent?.Invoke(gameModel);
 					LoadingMenu.SetActive(false);
@@ -151,10 +160,13 @@ namespace Assets.Scripts.Managers
 			yield return null;
 		}
 
+		/// <summary>
+		/// Kill the connection with SignalR when the API manager is being destroyed.
+		/// </summary>
 		void OnDestroy()
 		{
 			if (_srLib == null) return;
-			Debug.Log("Disconnecting from server");
+			Debug.Log("Disconnecting from server.");
 			_srLib.Exit();
 		}
 	}

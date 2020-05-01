@@ -100,7 +100,11 @@ namespace Assets.Scripts.Managers
 			}
 			catch (Exception e)
 			{
+#if UNITY_EDITOR
+				Debug.LogError(e.StackTrace);
+#else
 				Debug.LogError(e.Message);
+#endif
 			}
 		}
 

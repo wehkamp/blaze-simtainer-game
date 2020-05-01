@@ -29,19 +29,19 @@ namespace Assets.Scripts.Managers
 		/// </summary>
 		public struct Vehicle
 		{
-			public GameObject gameObject { get; }
-			public VisualizedVehicleModel vehicleModel { get; }
-			public NeighbourhoodModel neighbourhoodModel { get; }
+			public GameObject VehicleGameObject { get; }
+			public VisualizedVehicleModel VehicleModel { get; }
+			public NeighbourhoodModel NeighbourhoodModel { get; }
 
-			public string defaultPrefabName { get; }
+			public string VehicleName { get; }
 
-			public Vehicle(GameObject gameObject, VisualizedVehicleModel vehicleModel,
-				NeighbourhoodModel neighbourhoodModel, string defaultPrefabName)
+			public Vehicle(GameObject vehicleGameObject, VisualizedVehicleModel vehicleModel,
+				NeighbourhoodModel neighbourhoodModel, string vehicleName)
 			{
-				this.gameObject = gameObject;
-				this.vehicleModel = vehicleModel;
-				this.neighbourhoodModel = neighbourhoodModel;
-				this.defaultPrefabName = defaultPrefabName;
+				VehicleGameObject = vehicleGameObject;
+				VehicleModel = vehicleModel;
+				NeighbourhoodModel = neighbourhoodModel;
+				VehicleName = vehicleName;
 			}
 		}
 
@@ -75,21 +75,21 @@ namespace Assets.Scripts.Managers
 				while (_vehicleQueue.Count > 0)
 				{
 					Vehicle v = _vehicleQueue.Dequeue();
-					if (v.gameObject != null && v.neighbourhoodModel != null)
+					if (v.VehicleGameObject != null && v.NeighbourhoodModel != null)
 					{
-						v.gameObject.GetComponent<VehicleNavigator>().StartPathFinding();
+						v.VehicleGameObject.GetComponent<VehicleNavigator>().StartPathFinding();
 						VehicleSpawned?.Invoke(v);
 
-						IVisualizedObject vehicle = v.neighbourhoodModel.VisualizedObjects.SingleOrDefault(x =>
-							x is VisualizedVehicleModel && x.Identifier == v.vehicleModel.Identifier);
+						IVisualizedObject vehicle = v.NeighbourhoodModel.VisualizedObjects.SingleOrDefault(x =>
+							x is VisualizedVehicleModel && x.Identifier == v.VehicleModel.Identifier);
 						// If vehicle is not in the list of visualized objects of a neighbourhood, add it
 						if (vehicle == null)
 						{
-							v.vehicleModel.GameObject = v.gameObject;
-							v.neighbourhoodModel.VisualizedObjects.Add(v.vehicleModel);
+							v.VehicleModel.GameObject = v.VehicleGameObject;
+							v.NeighbourhoodModel.VisualizedObjects.Add(v.VehicleModel);
 						}
 						else
-							vehicle.GameObject = v.gameObject;
+							vehicle.GameObject = v.VehicleGameObject;
 					}
 
 					yield return new WaitForSeconds(0.3f);
@@ -109,7 +109,7 @@ namespace Assets.Scripts.Managers
 				.SelectMany(x => x.VisualizedObjects)
 				.Where(x => x is VisualizedVehicleModel).Cast<VisualizedVehicleModel>().Shuffle())
 			{
-				if (Vehicles.All(x => x.vehicleModel.Identifier != updatedVehicle.Identifier))
+				if (Vehicles.All(x => x.VehicleModel.Identifier != updatedVehicle.Identifier))
 				{
 					if (updatedVehicle.Size > 0)
 						SpawnVehicle(updatedVehicle);
@@ -128,7 +128,7 @@ namespace Assets.Scripts.Managers
 			if (updateEventModel.UpdatedVisualizedObjects == null) return;
 
 			// Select all vehicles that we currently have.
-			List<VisualizedVehicleModel> oldVehicles = Vehicles.Select(x => x.vehicleModel).ToList();
+			List<VisualizedVehicleModel> oldVehicles = Vehicles.Select(x => x.VehicleModel).ToList();
 
 			// Select all the new vehicles we got from the API.
 			List<VisualizedVehicleModel> newVehicles =
@@ -144,13 +144,13 @@ namespace Assets.Scripts.Managers
 			// Remove all the old vehicles and mark them to destroy.
 			foreach (VisualizedVehicleModel removedVehicle in removedVehicles)
 			{
-				Vehicle v = Vehicles.Single(x => x.vehicleModel.Equals(removedVehicle));
+				Vehicle v = Vehicles.Single(x => x.VehicleModel.Equals(removedVehicle));
 
-				if (v.neighbourhoodModel.VisualizedObjects.Contains(v.vehicleModel))
-					v.neighbourhoodModel.VisualizedObjects.Remove(v.vehicleModel);
-				if (CameraController.Instance.FollowTargetObject == v.gameObject)
+				if (v.NeighbourhoodModel.VisualizedObjects.Contains(v.VehicleModel))
+					v.NeighbourhoodModel.VisualizedObjects.Remove(v.VehicleModel);
+				if (CameraController.Instance.FollowTargetObject == v.VehicleGameObject)
 					CameraController.Instance.StopFollowingTarget();
-				Destroy(v.gameObject);
+				Destroy(v.VehicleGameObject);
 				Vehicles.Remove(v);
 			}
 

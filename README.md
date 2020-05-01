@@ -50,9 +50,10 @@ If you want to use these assets, read chapter 5.1
 
 ### 1.3 Used libraries
 
-SignalR support for WebGL (included) - <https://github.com/evanlindsey/Unity-WebGL-SignalR>
-SimpleJSON (included) - <https://wiki.unity3d.com/index.php/SimpleJSON>
-UnityRuntimePreviewGenerator (included) - <https://github.com/yasirkula/UnityRuntimePreviewGenerator>
+* SignalR support for WebGL (included) - <https://github.com/evanlindsey/Unity-WebGL-SignalR>
+* SimpleJSON (included) - <https://wiki.unity3d.com/index.php/SimpleJSON>
+* UnityRuntimePreviewGenerator (included) - <https://github.com/yasirkula/UnityRuntimePreviewGenerator>
+* NavMeshComponents (included) - <https://github.com/Unity-Technologies/NavMeshComponents>
 
 ### 1.4 Controls
 
@@ -82,7 +83,6 @@ The game makes use of so called asset bundles. This is an Unity feature where yo
 This will mean you only need to make a pack of assets, edit the game config file and you can include them within the game for easy deployment.
 
 No need to modify/compile the game yourself.
-
 
 ### Assets
 

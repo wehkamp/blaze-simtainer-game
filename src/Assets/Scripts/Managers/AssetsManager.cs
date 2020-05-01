@@ -110,66 +110,74 @@ namespace Assets.Scripts.Managers
 				Material m = (Material) o;
 				string shaderName = m.shader.name;
 				Shader newShader = Shader.Find(shaderName);
-				
+
 				if (newShader != null)
 				{
 					m.shader = newShader;
 				}
+#if UNITY_EDITOR
 				else
 				{
 					Debug.LogWarning("unable to refresh shader: " + shaderName + " in material " + m.name);
 				}
+#endif
+				// Add the material to the cache dictionary
 				_materialCacheDictionary.Add(m.name.Split(' ')[0], m);
 			}
 		}
 
 		/// <summary>
-		/// Function that return a building object together with the rotation of a building
+		/// Function that returns a building object together with the rotation of a building.
 		/// </summary>
 		/// <param name="size"></param>
 		/// <param name="age"></param>
 		/// <returns></returns>
 		public Tuple<GameObject, float> GetBuildingPrefab(int size, int age)
 		{
-			GameObject g;
-			// return GetPrefab(_assetBundleSettingsSettings.Buildings.First().PrefabName);
 			foreach (BuildingPrefab buildingPrefab in _buildingPrefabs)
 			{
 				if (size > buildingPrefab.MinSize)
 				{
 					Prefab prefab;
 					if (age < _buildingDecayedThreshold)
-					{
 						prefab = buildingPrefab.Prefabs.PickRandom();
-					}
 					else
-					{
 						prefab = buildingPrefab.DecayedPrefabs.PickRandom();
-					}
-					g = GetPrefab(prefab.Name);
-					return new Tuple<GameObject, float>(g, prefab.Rotation);
+
+					return new Tuple<GameObject, float>(GetPrefab(prefab.Name), prefab.Rotation);
 				}
 			}
 
 			return null;
 		}
 
+		/// <summary>
+		/// Function that returns a vehicle prefab by the vehicle name.
+		/// </summary>
+		/// <param name="vehicleName"></param>
+		/// <returns></returns>
 		public GameObject GetVehiclePrefab(string vehicleName)
 		{
 			VehiclePrefab v = _vehiclePrefabs.Single(x => x.Name == vehicleName);
 			// Load random prefab
 			string prefabName = v.PrefabNames.PickRandom();
-			GameObject g = _prefabCacheDictionary.ContainsKey(prefabName)
+			GameObject vehiclePrefab = _prefabCacheDictionary.ContainsKey(prefabName)
 				? _prefabCacheDictionary[prefabName]
 				: GetPrefab(prefabName);
 
-			if (g.GetComponent<NavMeshAgent>() == null)
-				g.AddComponent<NavMeshAgent>();
+			if (vehiclePrefab.GetComponent<NavMeshAgent>() == null)
+				vehiclePrefab.AddComponent<NavMeshAgent>();
 			// Set the correct speed
-			g.GetComponent<NavMeshAgent>().speed = v.Speed;
-			return g;
+			vehiclePrefab.GetComponent<NavMeshAgent>().speed = v.Speed;
+			return vehiclePrefab;
 		}
 
+		/// <summary>
+		/// Function to get a prefab by name.
+		/// </summary>
+		/// <param name="prefabName"></param>
+		/// <param name="cache"></param>
+		/// <returns></returns>
 		public GameObject GetPrefab(string prefabName, bool cache = true)
 		{
 			if (_prefabCacheDictionary.ContainsKey(prefabName) && cache)
@@ -183,6 +191,11 @@ namespace Assets.Scripts.Managers
 			return g;
 		}
 
+		/// <summary>
+		/// Function to get a material by name.
+		/// </summary>
+		/// <param name="materialName"></param>
+		/// <returns></returns>
 		public Material GetMaterial(string materialName)
 		{
 			if (_materialCacheDictionary.ContainsKey(materialName))
@@ -192,6 +205,9 @@ namespace Assets.Scripts.Managers
 			return mat;
 		}
 
+		/// <summary>
+		/// Predefined prefabs that should always be available
+		/// </summary>
 		public enum PrefabType
 		{
 			RoadStraight,
@@ -208,6 +224,11 @@ namespace Assets.Scripts.Managers
 			DestroyFx
 		}
 
+		/// <summary>
+		/// Function that returns a predefined prefab based on the name as configured in the config.json.
+		/// </summary>
+		/// <param name="prefabType"></param>
+		/// <returns></returns>
 		public GameObject GetPredefinedPrefab(PrefabType prefabType)
 		{
 			switch (prefabType)
@@ -262,7 +283,7 @@ namespace Assets.Scripts.Managers
 		}
 
 		/// <summary>
-		/// Function where all the prefab's are defined.
+		/// Function that returns a sprite of a vehicle by the vehicle name.
 		/// </summary>
 		/// <param name="vehicleName"></param>
 		/// <returns></returns>
@@ -276,6 +297,7 @@ namespace Assets.Scripts.Managers
 
 		/// <summary>
 		/// Function to generate sprites for every vehicle in the game.
+		/// It generates the sprite for the first prefab in the list.
 		/// </summary>
 		private void GenerateVehicleSprites()
 		{
@@ -290,6 +312,9 @@ namespace Assets.Scripts.Managers
 			}
 		}
 
+		/// <summary>
+		/// Unload the assets when the assets manager is being destroyed.
+		/// </summary>
 		void OnDestroy()
 		{
 			_assetBundle.Unload(true);

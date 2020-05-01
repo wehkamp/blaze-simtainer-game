@@ -81,7 +81,7 @@ namespace Assets.Scripts.Managers
 		/// <param name="firingEnabled"></param>
 		public void SetFiringEnabled(bool firingEnabled)
 		{
-			if (_tankNavigator != null)
+			if (_tankGameObject != null)
 				_tankNavigator.IsFiringEnabled = firingEnabled;
 			if (_planeGameObject != null)
 				_planeNavigator.IsFiringEnabled = firingEnabled;
