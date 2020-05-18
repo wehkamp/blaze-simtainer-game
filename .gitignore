@@ -1,0 +1,13 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/src/Assets/AssetBundles/paid.meta
+/src/Assets/AssetBundles/paid.meta
+/src/Assets/AssetBundles/paid.manifest.meta
+/src/Assets/AssetBundles/paid.manifest
+/src/Assets/AssetBundles/paid
+/src/Assets/AssetBundles/free.meta
+/src/Assets/AssetBundles/free.manifest.meta
+/src/Assets/AssetBundles/free.manifest
+/src/Assets/AssetBundles/free

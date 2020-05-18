@@ -37,6 +37,8 @@
             "Rotation": 0
           }
         ],
+        "Name": "BuildingXS",
+        "Label": "$",
         "MinSize": 0
       },
       {
@@ -52,6 +54,8 @@
             "Rotation": 0
           }
         ],
+        "Name": "BuildingS",
+        "Label": "$$",
         "MinSize": 20
       },
       {
@@ -67,6 +71,8 @@
             "Rotation": 0
           }
         ],
+        "Name": "BuildingM",
+        "Label": "$$$",
         "MinSize": 20
       },
       {
@@ -82,6 +88,8 @@
             "Rotation": 0
           }
         ],
+        "Name": "BuildingL",
+        "Label": "$$$$",
         "MinSize": 30
       }
     ],

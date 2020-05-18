@@ -94,7 +94,7 @@ namespace Assets.Scripts.Managers
 
 		{
 			// Controls are locked, do nothing
-			
+
 
 			// Check if user is focused on an UI-element
 			if (EventSystem.current.IsPointerOverGameObject()) return;
@@ -142,8 +142,8 @@ namespace Assets.Scripts.Managers
 
 			// Move the camera (camera_target) Forward relative to current rotation if "W" is pressed or if the mouse moves within the borderWidth distance from the top edge of the screen
 
-			if (Input.GetKey("w") || EdgeScrolling && Input.mousePosition.y >= Screen.height - BorderWidth)
-
+			if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow) || EdgeScrolling &&
+			    Input.mousePosition.y >= Screen.height - BorderWidth)
 			{
 				pos += forward * PanSpeed * Time.deltaTime;
 			}
@@ -151,8 +151,8 @@ namespace Assets.Scripts.Managers
 
 			// Move the camera (camera_target) Backward relative to current rotation if "S" is pressed or if the mouse moves within the borderWidth distance from the bottom edge of the screen
 
-			if (Input.GetKey("s") || EdgeScrolling && Input.mousePosition.y <= BorderWidth)
-
+			if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow) || EdgeScrolling &&
+			    Input.mousePosition.y <= BorderWidth)
 			{
 				pos -= forward * PanSpeed * Time.deltaTime;
 			}
@@ -160,8 +160,8 @@ namespace Assets.Scripts.Managers
 
 			// Move the camera (camera_target) Right relative to current rotation if "D" is pressed or if the mouse moves within the borderWidth distance from the right edge of the screen
 
-			if (Input.GetKey("d") || EdgeScrolling && Input.mousePosition.x >= Screen.width - BorderWidth)
-
+			if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow) || EdgeScrolling &&
+			    Input.mousePosition.x >= Screen.width - BorderWidth)
 			{
 				pos += right * PanSpeed * Time.deltaTime;
 			}
@@ -169,12 +169,13 @@ namespace Assets.Scripts.Managers
 
 			// Move the camera (camera_target) Left relative to current rotation if "A" is pressed or if the mouse moves within the borderWidth distance from the left edge of the screen
 
-			if (Input.GetKey("a") || EdgeScrolling && Input.mousePosition.x <= BorderWidth)
-
+			if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow) || EdgeScrolling &&
+			    Input.mousePosition.x <= BorderWidth)
 			{
 				pos -= right * PanSpeed * Time.deltaTime;
 			}
 
+			// Check if we are not crossing the map border
 			if (pos.x <= -100f || pos.x >= _maxX || pos.z < -100f || pos.z >= _maxZ)
 			{
 				return;

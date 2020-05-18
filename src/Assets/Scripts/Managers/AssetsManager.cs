@@ -95,6 +95,7 @@ namespace Assets.Scripts.Managers
 			_assetBundle.LoadAllAssets();
 			// Generate vehicle sprites for the UI
 			GenerateVehicleSprites();
+			GenerateBuildingSprites();
 			// Fix shaders of all materials
 			RefreshShaders();
 			AssetsLoaded?.Invoke();
@@ -309,6 +310,26 @@ namespace Assets.Scripts.Managers
 						.transform);
 				// Add the sprite to the caching dictionary
 				_spriteCacheDictionary.Add(vehiclePrefab.Name, texture.GenerateSprite());
+			}
+		}
+
+		/// <summary>
+		/// Function to generate sprites for every vehicle in the game.
+		/// It generates the sprite for the first prefab in the list.
+		/// </summary>
+		private void GenerateBuildingSprites()
+		{
+			foreach (BuildingPrefab buildingPrefab in _assetBundleSettingsSettings.Buildings)
+			{
+				// Generate a texture of the prefab
+
+				Prefab firstBuildingPrefab = buildingPrefab.Prefabs.First();
+				GameObject buildingGameObject = GetPrefab(firstBuildingPrefab.Name);
+				buildingGameObject.transform.rotation = Quaternion.Euler(0f, firstBuildingPrefab.Rotation, 0f);
+				Texture2D texture =
+					RuntimePreviewGenerator.GenerateModelPreview(buildingGameObject.transform);
+				// Add the sprite to the caching dictionary
+				_spriteCacheDictionary.Add(buildingPrefab.Name, texture.GenerateSprite());
 			}
 		}
 
