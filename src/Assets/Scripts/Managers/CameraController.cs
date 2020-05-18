@@ -143,7 +143,7 @@ namespace Assets.Scripts.Managers
 			// Move the camera (camera_target) Forward relative to current rotation if "W" is pressed or if the mouse moves within the borderWidth distance from the top edge of the screen
 
 			if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow) || EdgeScrolling &&
-			    Input.mousePosition.y >= Screen.height - BorderWidth)
+				Input.mousePosition.y >= Screen.height - BorderWidth)
 			{
 				pos += forward * PanSpeed * Time.deltaTime;
 			}
@@ -152,7 +152,7 @@ namespace Assets.Scripts.Managers
 			// Move the camera (camera_target) Backward relative to current rotation if "S" is pressed or if the mouse moves within the borderWidth distance from the bottom edge of the screen
 
 			if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow) || EdgeScrolling &&
-			    Input.mousePosition.y <= BorderWidth)
+				Input.mousePosition.y <= BorderWidth)
 			{
 				pos -= forward * PanSpeed * Time.deltaTime;
 			}
@@ -161,7 +161,7 @@ namespace Assets.Scripts.Managers
 			// Move the camera (camera_target) Right relative to current rotation if "D" is pressed or if the mouse moves within the borderWidth distance from the right edge of the screen
 
 			if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow) || EdgeScrolling &&
-			    Input.mousePosition.x >= Screen.width - BorderWidth)
+				Input.mousePosition.x >= Screen.width - BorderWidth)
 			{
 				pos += right * PanSpeed * Time.deltaTime;
 			}
@@ -170,7 +170,7 @@ namespace Assets.Scripts.Managers
 			// Move the camera (camera_target) Left relative to current rotation if "A" is pressed or if the mouse moves within the borderWidth distance from the left edge of the screen
 
 			if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow) || EdgeScrolling &&
-			    Input.mousePosition.x <= BorderWidth)
+				Input.mousePosition.x <= BorderWidth)
 			{
 				pos -= right * PanSpeed * Time.deltaTime;
 			}
@@ -226,8 +226,8 @@ namespace Assets.Scripts.Managers
 
 			// When we scroll our mouse wheel up, zoom in if the camera is not within the minimum distance (set by our zoomMin variable)
 
-			if (Input.GetAxis("Mouse ScrollWheel") > 0f && size > ZoomMin)
-
+			if ((Input.GetAxis("Mouse ScrollWheel") > 0f || Input.GetKey(KeyCode.KeypadPlus) ||
+			     Input.GetKey(KeyCode.Plus)) && size > ZoomMin)
 			{
 				size -= ZoomSpeed * Time.deltaTime;
 			}
@@ -235,8 +235,8 @@ namespace Assets.Scripts.Managers
 
 			// When we scroll our mouse wheel down, zoom out if the camera is not outside of the maximum distance (set by our zoomMax variable)
 
-			if (Input.GetAxis("Mouse ScrollWheel") < 0f && size < ZoomMax)
-
+			if ((Input.GetAxis("Mouse ScrollWheel") < 0f || Input.GetKey(KeyCode.KeypadMinus) ||
+			     Input.GetKey(KeyCode.KeypadPlus)) && size < ZoomMax)
 			{
 				size += ZoomSpeed * Time.deltaTime;
 			}

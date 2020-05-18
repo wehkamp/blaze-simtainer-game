@@ -43,7 +43,7 @@ namespace Assets.Scripts.Components
 
 				g.GetComponentInChildren<TMP_Text>().text = buildingPrefab.Label;
 				_heightDeltaX += 35f;
-				panelHeightDeltaY += 35.1f;
+				panelHeightDeltaY += 35f;
 
 			}
 
