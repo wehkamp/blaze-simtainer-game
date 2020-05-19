@@ -74,12 +74,17 @@ namespace Assets.Scripts.Managers
 			{
 				while (_vehicleQueue.Count > 0)
 				{
+					// Grab the vehicle from the queue
 					Vehicle v = _vehicleQueue.Dequeue();
+					// Check if in the main time the neighbourhood is not de-spawned together with the vehicle
 					if (v.VehicleGameObject != null && v.NeighbourhoodModel != null)
 					{
+						// Start the path finding of the vehicle
 						v.VehicleGameObject.GetComponent<VehicleNavigator>().StartPathFinding();
+						// Fire the event that we spawned a vehicle
 						VehicleSpawned?.Invoke(v);
 
+						// Check if the vehicle is already in the list of the neighbourhood
 						IVisualizedObject vehicle = v.NeighbourhoodModel.VisualizedObjects.SingleOrDefault(x =>
 							x is VisualizedVehicleModel && x.Identifier == v.VehicleModel.Identifier);
 						// If vehicle is not in the list of visualized objects of a neighbourhood, add it
@@ -107,7 +112,7 @@ namespace Assets.Scripts.Managers
 		{
 			foreach (VisualizedVehicleModel updatedVehicle in gameModel.Neighbourhoods
 				.SelectMany(x => x.VisualizedObjects)
-				.Where(x => x is VisualizedVehicleModel).Cast<VisualizedVehicleModel>().Shuffle())
+				.OfType<VisualizedVehicleModel>().Shuffle())
 			{
 				if (Vehicles.All(x => x.VehicleModel.Identifier != updatedVehicle.Identifier))
 				{

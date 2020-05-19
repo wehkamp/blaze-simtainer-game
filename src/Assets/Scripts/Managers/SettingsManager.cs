@@ -47,13 +47,15 @@ namespace Assets.Scripts.Managers
 					Debug.Log("Settings loaded");
 					SettingsLoadedEvent?.Invoke();
 				}
-				catch (ArgumentException)
+				catch (ArgumentException e)
 				{
+					Debug.LogError(e.Message);
 					_alertText.text = $"Failed loading the configuration.\r\nInvalid configuration file.";
 					AlertCanvas.SetActive(true);
 				}
-				catch (FileNotFoundException)
+				catch (FileNotFoundException e)
 				{
+					Debug.LogError(e.Message);
 					_alertText.text = $"Failed loading the configuration.\r\nMissing configuration file.";
 					AlertCanvas.SetActive(true);
 				}

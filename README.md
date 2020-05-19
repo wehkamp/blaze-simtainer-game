@@ -59,15 +59,15 @@ If you want to use these assets, read chapter 5.1
 
 | Key                    | Action                                                          |
 |------------------------|-----------------------------------------------------------------|
-| W                      | Move the camera forward                                         |
-| A                      | Move the camera to the left                                     |
-| S                      | Move the camera backwards                                       |
-| D                      | Move the camera to the right                                    |
+| W / Up Arrow           | Move the camera forward                                         |
+| A / Left Arrow         | Move the camera to the left                                     |
+| S / Down Arrow         | Move the camera backwards                                       |
+| D / Right Arrow        | Move the camera to the right                                    |
 | Escape                 | Go back to the main menu                                        |
 | F4                     | Open the debug console                                          |
 | Left mouse button      | When clicked on a building or vehicle it displays information   |
 | Hold right mouse button| Rotate the camera around                                        |
-| Scroll                 | Zoom in or out                                                  |
+| Scroll / (KP) + or -   | Zoom in or out                                                  |
 
 ## 2. Configuration
 
@@ -158,6 +158,8 @@ Example configuration:
             "Rotation": 0
           }
         ],
+        "Label": "$",
+        "Name": "BuildingS",
         "MinSize": 15
       },
       {
@@ -173,6 +175,8 @@ Example configuration:
             "Rotation": 0
           }
         ],
+        "Label": "$$",
+        "Name": "BuildingM",
         "MinSize": 20
       },
       {
@@ -188,6 +192,8 @@ Example configuration:
             "Rotation": 0
           }
         ],
+        "Label": "$$$",
+        "Name": "BuildingL",
         "MinSize": 30
       }
     ],
@@ -340,7 +346,7 @@ The game model looks like the following:
   ],
   "layers": [ // Types of layers
     {
-      "icon": "images/cpu_icon.png", // Location to image on the back-end for example https://simtainer.yourorginzation.local/images/cpu_icon.png
+      "icon": "images/cpu_icon.png", // Location to image on the back-end for example https://simtainer.yourorganization.local/images/cpu_icon.png
       "layerType": "cpuLayer" // Name of the layer
     },
     {
@@ -593,4 +599,8 @@ There are other managers that have events as well, but the order does not matter
 
 ## 7. Developer note
 
-This project is my graduation project. If you have any questions, feedback or suggestions, feel free to contact me!
+This project is a graduation project. If you have any questions, feedback or suggestions, feel free to contact us (Harm Weites, Sebastiaan Bekker or Leroy van Dijk)!
+
+## 8. Icons
+
+Icons used in this project are from iconfinder.com created by DesignerzBase.
