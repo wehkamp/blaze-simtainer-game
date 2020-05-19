@@ -67,7 +67,7 @@ If you want to use these assets, read chapter 5.1
 | F4                     | Open the debug console                                          |
 | Left mouse button      | When clicked on a building or vehicle it displays information   |
 | Hold right mouse button| Rotate the camera around                                        |
-| Scroll / (KP) + or -   | Zoom in or out                                                  |
+| Scroll / KP + or -     | Zoom in or out                                                  |
 
 ## 2. Configuration
 
@@ -488,13 +488,15 @@ Depending on the size of the input the game will choose a vehicle to use. You ca
 Layers are fully dynamic depending on the API. Images should be placed at `BASEURL/images/example_icon.png`.
 These images are loaded in the game. You can find the example JSON at paragraph 3.2.
 
+**It is important to use a white icon, since Unity can only colorize white sprites.**
+
 We used the layers for metrics about CPU, Memory and 500 error's.
 
 Layers are managed in the LayerManager class.
 
 You can see the layers in action in the gif at the beginning of this readme.
 
-To disable Team Selection, edit the `config.json`.
+To disable Layers, edit the `config.json`.
 
 ### 4.4 Team selection
 
