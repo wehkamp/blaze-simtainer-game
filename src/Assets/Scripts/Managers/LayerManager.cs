@@ -19,11 +19,25 @@ namespace Assets.Scripts.Managers
 		public GameObject LayerSettingsPanel;
 		public VisualLayerModel SelectedLayer;
 
-		// List with objects that are used for a selected layer
-		private readonly List<GameObject> _selectedLayerObjects =
-			new List<GameObject>();
+		private readonly List<SpriteImageObject> _spriteObjects = new List<SpriteImageObject>();
+
+		/// <summary>
+		/// Struct used to combine an outline component and a visual layer model
+		/// </summary>
+		private struct SpriteImageObject
+		{
+			public readonly Image Image;
+			public readonly VisualLayerModel VisualLayerModel;
+
+			public SpriteImageObject(Image image, VisualLayerModel visualLayerModel)
+			{
+				Image = image;
+				VisualLayerModel = visualLayerModel;
+			}
+		}
 
 		private IOrderedEnumerable<LayerEffect> _layerEffects;
+
 		// Start is called before the first frame update
 		void Start()
 		{
@@ -50,7 +64,8 @@ namespace Assets.Scripts.Managers
 				heightDeltaY += gameModel.Layers.Count * 50;
 				rt.sizeDelta = new Vector2(rt.sizeDelta.x, heightDeltaY);
 
-				_layerEffects = SettingsManager.Instance.Settings.AssetBundle.LayerEffects.OrderByDescending(x=>x.Threshold);
+				_layerEffects =
+					SettingsManager.Instance.Settings.AssetBundle.LayerEffects.OrderByDescending(x => x.Threshold);
 			}
 			else
 			{
@@ -84,15 +99,14 @@ namespace Assets.Scripts.Managers
 				Button button = buttonObject.AddComponent<Button>();
 
 				Image image = buttonObject.AddComponent<Image>();
-
-
+				
 				Texture2D webTexture = ((DownloadHandlerTexture) www.downloadHandler).texture;
-
 
 				Sprite webSprite = webTexture.GenerateSprite();
 
-				image.overrideSprite = webSprite;
+				image.sprite = webSprite;
 
+				image.color = Color.black;
 				buttonObject.transform.SetParent(LayerPanel.transform);
 				RectTransform rt = buttonObject.GetComponent<RectTransform>();
 				rt.SetParent(LayerPanel.transform);
@@ -100,23 +114,37 @@ namespace Assets.Scripts.Managers
 				rt.localPosition = new Vector3(x, y, 0f);
 				rt.localScale = Vector3.one;
 				rt.sizeDelta = new Vector2(32, 32);
+				buttonObject.name = visualLayer.Name;
 
-				button.onClick.AddListener(delegate { OnClick(visualLayer); });
+				SpriteImageObject spriteImageObject = new SpriteImageObject(image, visualLayer);
+				_spriteObjects.Add(spriteImageObject);
+
+				button.onClick.AddListener(delegate { OnClick(spriteImageObject); });
 			}
 		}
 
 		/// <summary>
 		/// When a layer is clicked, set and load the selected layer
 		/// </summary>
-		/// <param name="visualLayer"></param>
-		private void OnClick(VisualLayerModel visualLayer)
+		/// <param name="selectedSpriteImageObject"></param>
+		private void OnClick(SpriteImageObject selectedSpriteImageObject)
 		{
 			// We do not want to spam the layers since there is no point of it
-			if (visualLayer.Equals(SelectedLayer))
+			if (selectedSpriteImageObject.VisualLayerModel.Equals(SelectedLayer))
 				return;
-			SelectedLayer = visualLayer;
+
+
+
+			foreach (SpriteImageObject sprite in _spriteObjects)
+			{
+				sprite.Image.color = sprite.VisualLayerModel.Equals(selectedSpriteImageObject.VisualLayerModel) ? Color.white : Color.black;
+			}
+
+			SelectedLayer = selectedSpriteImageObject.VisualLayerModel;
+
 			LoadLayer();
 		}
+
 
 		/// <summary>
 		/// This function will load a layer if clicked. Adding all effects to buildings.
@@ -136,7 +164,8 @@ namespace Assets.Scripts.Managers
 					neighbourhood.LayerValues.SingleOrDefault(x => x.LayerType == SelectedLayer.Name);
 				if (layerValueModel == null) continue;
 
-				foreach (IVisualizedBuilding visualizedObject in neighbourhood.VisualizedObjects.OfType<IVisualizedBuilding>())
+				foreach (IVisualizedBuilding visualizedObject in neighbourhood.VisualizedObjects
+					.OfType<IVisualizedBuilding>())
 				{
 					if (visualizedObject.LayerValues == null || visualizedObject.GameObject == null)
 					{
@@ -154,8 +183,8 @@ namespace Assets.Scripts.Managers
 					{
 						if (avg > layerEffect.Threshold)
 						{
-							visualizedObject.GameObject.AddComponent<Effect>().SetFx(AssetsManager.Instance.GetPrefab(layerEffect.PrefabName));
-							_selectedLayerObjects.Add(visualizedObject.GameObject);
+							visualizedObject.GameObject.AddComponent<Effect>()
+								.SetFx(AssetsManager.Instance.GetPrefab(layerEffect.PrefabName));
 							break;
 						}
 					}
@@ -163,17 +192,28 @@ namespace Assets.Scripts.Managers
 			}
 		}
 
+		/// <summary>
+		/// Function to clear all layer effects. Destroys all effects.
+		/// </summary>
+		/// <param name="clearSelectedLayer">Set this to true if you want to clear the selected layer.
+		/// Used in closing the layer button.</param>
 		public void ClearEffects(bool clearSelectedLayer = false)
 		{
-			foreach (GameObject selectedObjects in _selectedLayerObjects)
+			// Find all effects that exists in the game
+			Effect[] effects = FindObjectsOfType<Effect>();
+			foreach (Effect effect in effects)
 			{
-				Destroy(selectedObjects.GetComponent<Effect>());
+				// Destroy the effect
+				Destroy(effect);	
 			}
 
-			_selectedLayerObjects.Clear();
+			if (!clearSelectedLayer) return;
 
-			if (clearSelectedLayer)
-				SelectedLayer = null;
+			SelectedLayer = null;
+			foreach (SpriteImageObject spriteOutlineObject in _spriteObjects)
+			{
+				spriteOutlineObject.Image.color = Color.black;
+			}
 		}
 	}
 }

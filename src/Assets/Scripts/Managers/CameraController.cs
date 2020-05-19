@@ -226,8 +226,7 @@ namespace Assets.Scripts.Managers
 
 			// When we scroll our mouse wheel up, zoom in if the camera is not within the minimum distance (set by our zoomMin variable)
 
-			if ((Input.GetAxis("Mouse ScrollWheel") > 0f || Input.GetKey(KeyCode.KeypadPlus) ||
-			     Input.GetKey(KeyCode.Plus)) && size > ZoomMin)
+			if ((Input.GetAxis("Mouse ScrollWheel") > 0f || Input.GetKey(KeyCode.KeypadPlus)) && size > ZoomMin)
 			{
 				size -= ZoomSpeed * Time.deltaTime;
 			}
@@ -235,8 +234,7 @@ namespace Assets.Scripts.Managers
 
 			// When we scroll our mouse wheel down, zoom out if the camera is not outside of the maximum distance (set by our zoomMax variable)
 
-			if ((Input.GetAxis("Mouse ScrollWheel") < 0f || Input.GetKey(KeyCode.KeypadMinus) ||
-			     Input.GetKey(KeyCode.KeypadPlus)) && size < ZoomMax)
+			if ((Input.GetAxis("Mouse ScrollWheel") < 0f || Input.GetKey(KeyCode.KeypadMinus)) && size < ZoomMax)
 			{
 				size += ZoomSpeed * Time.deltaTime;
 			}

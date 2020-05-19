@@ -11,7 +11,7 @@
     "MinimumBuildings": 2
   },
   "Grid": {
-    "TilesPerStreet": 50
+    "TilesPerStreet": 60
   },
   "Layers": {
     "Enabled": true
