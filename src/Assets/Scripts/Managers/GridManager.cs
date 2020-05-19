@@ -21,7 +21,7 @@ namespace Assets.Scripts.Managers
 		// Rows are dynamic and changed in the generate city function to match a little with the amount of instances
 		public int Rows { get; private set; } = 50;
 
-		// Cols is a solid 50
+		// Cols is being set by the SettingsManager
 		public int Cols { get; private set; } = 50;
 
 		public const int TileSize = 10;
@@ -67,14 +67,13 @@ namespace Assets.Scripts.Managers
 				x => x.VisualizedObjects.Count
 			).Sum();
 
-			// Make rows based on amount of instances in total divided by 14 so we always have enough space.
-			Rows = instances / 14;
+			Cols = SettingsManager.Instance.Settings.Grid.TilesPerStreet;
 
+			Rows = (instances + gameModel.Neighbourhoods.Count) / Cols * 3;
 			// We always want an uneven number of rows so we can generate a street everywhere
 			if (Rows % 2 == 0)
 				Rows++;
 
-			Cols = SettingsManager.Instance.Settings.Grid.TilesPerStreet;
 			GenerateGrid();
 			VehicleSpawnPoints.Add(new Vector3(0f, 0.2f, 0f), Quaternion.Euler(0, 0f, 0));
 			VehicleSpawnPoints.Add(new Vector3(Cols * TileSize - TileSize, 0.2f, 0f), Quaternion.Euler(0, 0f, 0));
@@ -235,9 +234,11 @@ namespace Assets.Scripts.Managers
 
 			float spawnOffsetX = 0;
 			int tileIndex = 0;
+			// Loop through all the visualized objects
 			for (int index = 0; index < visualizedObjects.Count; index++)
 			{
 				Tile tile = tiles[tileIndex];
+				// If the tile is already filled, destroy it.
 				if (Grid[tile] != null && Grid[tile].GameObject != null)
 					Destroy(Grid[tile].GameObject);
 

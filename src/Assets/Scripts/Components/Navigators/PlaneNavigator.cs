@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Assets.Scripts.Interfaces;
 using Assets.Scripts.Managers;
 using Assets.Scripts.Utils;
 using UnityEngine;
@@ -147,7 +148,7 @@ namespace Assets.Scripts.Components.Navigators
 					.Instance.GameModel
 					.Neighbourhoods
 					.Single(x => x.Name == hit.collider.gameObject.name.Replace("neighbourhood-", ""))
-					.VisualizedObjects.Count >= MinimumBuildings)
+					.VisualizedObjects.Count(x=>x is IVisualizedBuilding) >= MinimumBuildings)
 				{
 					_fired = true;
 					Instantiate(AssetsManager.Instance.GetPredefinedPrefab(AssetsManager.PrefabType.Bomb),

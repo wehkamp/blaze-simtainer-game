@@ -11,7 +11,7 @@
     "MinimumBuildings": 2
   },
   "Grid": {
-    "TilesPerStreet": 50
+    "TilesPerStreet": 60
   },
   "Layers": {
     "Enabled": true
@@ -37,6 +37,8 @@
             "Rotation": 90
           }
         ],
+        "Name": "BuildingXS",
+        "Label": "$",
         "MinSize": 0
       },
       {
@@ -52,6 +54,8 @@
             "Rotation": 90
           }
         ],
+        "Name": "BuildingS",
+        "Label": "$",
         "MinSize": 5
       },
       {
@@ -67,6 +71,8 @@
             "Rotation": 90
           }
         ],
+        "Name": "BuildingSM",
+        "Label": "$",
         "MinSize": 10
       },
       {
@@ -82,6 +88,8 @@
             "Rotation": 90
           }
         ],
+        "Name": "BuildingM",
+        "Label": "$$",
         "MinSize": 15
       },
       {
@@ -105,6 +113,8 @@
             "Rotation": 90
           }
         ],
+        "Name": "BuildingML",
+        "Label": "$$",
         "MinSize": 20
       },
       {
@@ -120,6 +130,8 @@
             "Rotation": 180
           }
         ],
+        "Name": "BuildingL",
+        "Label": "$$",
         "MinSize": 30
       },
       {
@@ -135,6 +147,8 @@
             "Rotation": 90
           }
         ],
+        "Name": "BuildingXL",
+        "Label": "$$$",
         "MinSize": 40
       },
       {
@@ -166,6 +180,8 @@
             "Rotation": 0
           }
         ],
+        "Name": "BuildingXXL",
+        "Label": "$$$",
         "MinSize": 80
       },
       {
@@ -181,6 +197,8 @@
             "Rotation": 90
           }
         ],
+        "Name": "BuildingXXXL",
+        "Label": "$$$$",
         "MinSize": 120
       }
     ],

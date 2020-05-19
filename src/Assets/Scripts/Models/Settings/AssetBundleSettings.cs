@@ -49,6 +49,8 @@ namespace Assets.Scripts.Models.Settings
 	{
 		public List<Prefab> Prefabs;
 		public List<Prefab> DecayedPrefabs;
+		public string Label;
+		public string Name;
 		public int MinSize;
 	}
 
