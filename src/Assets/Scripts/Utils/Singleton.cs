@@ -8,7 +8,7 @@ namespace Assets.Scripts.Utils
 	/// Inherit from this base class to create a singleton.
 	/// e.g. public class MyClassName : Singleton<MyClassName> {}
 	/// </summary>
-	internal class Singleton<T> : MonoBehaviour where T : MonoBehaviour
+	internal abstract class Singleton<T> : MonoBehaviour where T : MonoBehaviour
 	{
 		// Check to see if we're about to be destroyed.
 		private static object m_Lock = new object();

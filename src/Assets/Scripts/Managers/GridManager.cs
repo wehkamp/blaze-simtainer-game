@@ -235,9 +235,11 @@ namespace Assets.Scripts.Managers
 
 			float spawnOffsetX = 0;
 			int tileIndex = 0;
+			// Loop through all the visualized objects
 			for (int index = 0; index < visualizedObjects.Count; index++)
 			{
 				Tile tile = tiles[tileIndex];
+				// If the tile is already filled, destroy it.
 				if (Grid[tile] != null && Grid[tile].GameObject != null)
 					Destroy(Grid[tile].GameObject);
 

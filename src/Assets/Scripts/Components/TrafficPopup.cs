@@ -26,10 +26,6 @@ namespace Assets.Scripts.Components
 
 		void OnEnable()
 		{
-			foreach (var vehiclePrefab in SettingsManager.Instance.Settings.AssetBundle.Vehicles)
-			{
-			}
-
 			UpdatePopup();
 			TrafficManager.Instance.TrafficUpdateEvent.AddListener(UpdatePopup);
 			TeamManager.Instance.TeamSelectionChangedEvent.AddListener(UpdatePopup);
@@ -45,6 +41,9 @@ namespace Assets.Scripts.Components
 			InfoGameObjects.Clear();
 		}
 
+		/// <summary>
+		/// Function to refresh the popup with new information.
+		/// </summary>
 		private void UpdatePopup()
 		{
 			IEnumerable<TrafficManager.Vehicle> vehicles = TrafficManager.Instance.Vehicles.OrderBy(x =>
@@ -65,21 +64,29 @@ namespace Assets.Scripts.Components
 			}
 		}
 
-
+		/// <summary>
+		/// Function to add a row to the table of traffic.
+		/// </summary>
+		/// <param name="sprite"></param>
+		/// <param name="service"></param>
+		/// <param name="vehicleModel"></param>
+		/// <param name="vehicleGameObject"></param>
 		private void AddRow(Sprite sprite, string service, VisualizedVehicleModel vehicleModel,
 			GameObject vehicleGameObject)
 		{
 			GameObject trafficRow;
-			TMP_Text[] texts;
-			// We already have this row, so we only update the object?
+			// Check if we already have this row, so we only need to update the object?
 			if (InfoGameObjects.ContainsKey(vehicleModel.Identifier))
 			{
 				trafficRow = InfoGameObjects[vehicleModel.Identifier];
 			}
 			else
 			{
+				// Row does not exists, create one
 				trafficRow =
 					Instantiate(TrafficOverviewRowPrefab);
+
+				// Add an event trigger object so we can make the button clickable
 				EventTrigger eventTrigger = trafficRow.AddComponent<EventTrigger>();
 				EventTrigger.Entry entry = new EventTrigger.Entry {eventID = EventTriggerType.PointerClick};
 				entry.callback.AddListener(eventData =>
@@ -92,12 +99,14 @@ namespace Assets.Scripts.Components
 				InfoGameObjects.Add(vehicleModel.Identifier, trafficRow);
 			}
 
-			texts = trafficRow.GetComponentsInChildren<TMP_Text>();
+			TMP_Text[] texts = trafficRow.GetComponentsInChildren<TMP_Text>();
 			Image image = trafficRow.GetComponentInChildren<Image>();
 
+			// Set the correct text. Row 0 = name of the service, Row 1 = the size of the service
 			texts[0].text = service;
 			texts[1].text = vehicleModel.Size.ToString();
 
+			// Set the correct sprite
 			image.sprite = sprite;
 		}
 	}
