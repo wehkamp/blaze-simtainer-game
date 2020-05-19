@@ -11,55 +11,46 @@ namespace Assets.Scripts.Components
 		public GameObject Image;
 
 		public GameObject LegendPanel;
-		private float _heightDeltaX = 10f;
+		private float _heightDeltaX = 5f;
 
 		// Start is called before the first frame update
 		void Start()
 		{
 			AssetsManager.Instance.AssetsLoaded.AddListener(AssetsLoaded);
-
 		}
 
 		private void AssetsLoaded()
 		{
-			// RectTransform imageRt = Image.GetComponent<RectTransform>();
-			// _heightDeltaX = imageRt.transform.localPosition.y;
-
 			float panelHeightDeltaY = 0f;
+			// Loop through all building prefabs from the configuration
 			foreach (BuildingPrefab buildingPrefab in SettingsManager.Instance.Settings.AssetBundle.Buildings)
 			{
-				GameObject g = Instantiate(Image, transform);
-				g.transform.SetParent(LegendPanel.transform);
-				g.SetActive(true);
-				Image img = g.GetComponent<Image>();
+				// Create an image prefab
+				GameObject imageGameObject = Instantiate(Image, transform);
+				imageGameObject.transform.SetParent(LegendPanel.transform);
+				imageGameObject.SetActive(true);
+
+				// Override the sprite
+				Image img = imageGameObject.GetComponent<Image>();
 				img.overrideSprite = AssetsManager.Instance.GetVehicleSpritesByType(buildingPrefab.Name);
 
-				RectTransform rt = g.GetComponent<RectTransform>();
-				// rt.localPosition = new Vector3(rt.localPosition.x, rt.localPosition.y + _heightDeltaX,
-				// 	rt.localPosition.z);
-				Debug.Log($"{_heightDeltaX}");
+				// Set the position of the icon
+				RectTransform rt = imageGameObject.GetComponent<RectTransform>();
 				rt.SetInsetAndSizeFromParentEdge(RectTransform.Edge.Left, 10f, rt.rect.width);
 				rt.SetInsetAndSizeFromParentEdge(RectTransform.Edge.Top, _heightDeltaX, rt.rect.height);
 
-				g.GetComponentInChildren<TMP_Text>().text = buildingPrefab.Label;
+				// Set the label of the icon
+				imageGameObject.GetComponentInChildren<TMP_Text>().text = buildingPrefab.Label;
+
+				// Add some height
 				_heightDeltaX += 35f;
 				panelHeightDeltaY += 35f;
 
 			}
 
-			// Apply some panel settings
 			RectTransform panelRt = LegendPanel.GetComponent<RectTransform>();
-
-			float heightDeltaY = panelRt.sizeDelta.y;
-
-			heightDeltaY += panelHeightDeltaY;
-			panelRt.sizeDelta = new Vector2(panelRt.sizeDelta.x, heightDeltaY);
-			LegendPanel.SetActive(false);
-		}
-
-		// Update is called once per frame
-		void Update()
-		{
+			// Set the height of the panel
+			panelRt.sizeDelta = new Vector2(panelRt.sizeDelta.x, panelRt.sizeDelta.y + panelHeightDeltaY);
 		}
 	}
 }
