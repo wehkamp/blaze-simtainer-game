@@ -49,7 +49,10 @@ namespace Assets.Scripts.Managers
 		{
 			if (SettingsManager.Instance.Settings.Layers.Enabled)
 			{
+				// Default Y = -20
 				float y = -20f;
+
+				// Loop through all layers and generate a button with the correct texture
 				foreach (VisualLayerModel layer in gameModel.Layers)
 				{
 					StartCoroutine(GenerateButtonWithTexture(layer, 0f, y));
@@ -61,6 +64,7 @@ namespace Assets.Scripts.Managers
 
 				float heightDeltaY = rt.sizeDelta.y;
 
+				// Set the correct height for the layers panel
 				heightDeltaY += gameModel.Layers.Count * 50;
 				rt.sizeDelta = new Vector2(rt.sizeDelta.x, heightDeltaY);
 
@@ -96,29 +100,37 @@ namespace Assets.Scripts.Managers
 			{
 				GameObject buttonObject = new GameObject();
 
+				// Create a button
 				Button button = buttonObject.AddComponent<Button>();
 
+				// Create an image
 				Image image = buttonObject.AddComponent<Image>();
-				
+		
+				// The downloaded texture (should always have a white color)
 				Texture2D webTexture = ((DownloadHandlerTexture) www.downloadHandler).texture;
 
+				// Make a sprite of the downloaded texture
 				Sprite webSprite = webTexture.GenerateSprite();
 
 				image.sprite = webSprite;
 
 				image.color = Color.black;
 				buttonObject.transform.SetParent(LayerPanel.transform);
+
+				// Set the correct position for the button
 				RectTransform rt = buttonObject.GetComponent<RectTransform>();
 				rt.SetParent(LayerPanel.transform);
-
 				rt.localPosition = new Vector3(x, y, 0f);
 				rt.localScale = Vector3.one;
 				rt.sizeDelta = new Vector2(32, 32);
+
+				// Set the name of the button
 				buttonObject.name = visualLayer.Name;
 
 				SpriteImageObject spriteImageObject = new SpriteImageObject(image, visualLayer);
 				_spriteObjects.Add(spriteImageObject);
 
+				// Create the onclick function
 				button.onClick.AddListener(delegate { OnClick(spriteImageObject); });
 			}
 		}

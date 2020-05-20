@@ -1,10 +1,8 @@
-﻿using Assets.Scripts.Components;
-using Assets.Scripts.Interfaces;
+﻿using Assets.Scripts.Interfaces;
 using Assets.Scripts.Models;
 using Assets.Scripts.Models.VisualizedObjects;
 using Assets.Scripts.Utils;
 using UnityEngine;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Assets.Scripts.Components.Navigators;
@@ -93,7 +91,7 @@ namespace Assets.Scripts.Managers
 		/// </summary>
 		void LateUpdate()
 		{
-			// We need to pick a new target here
+			// We need to pick a new target for the tank here
 			if (_tankNavigator != null && _tankNavigator.Target == null && !_tankNavigator.IsStandby)
 			{
 				IVisualizedObject target = SelectTarget();
@@ -142,11 +140,9 @@ namespace Assets.Scripts.Managers
 				return null;
 			}
 
+			// Pick a random neighbourhood from the list
 			NeighbourhoodModel randomNeighbourhoodModel =
 				randomNeighbourhoodQuery.PickRandom();
-
-			// No target found. Tank is probably going in standby mode now.
-
 
 			// We found a target and it's a building. Return the target.
 			IVisualizedObject obj = randomNeighbourhoodModel.VisualizedObjects

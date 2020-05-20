@@ -156,6 +156,8 @@ namespace Assets.Scripts.Managers
 		/// </summary>
 		private void SpawnMainRoads()
 		{
+			// Loop through all empty tiles on the borders of the map
+			// X = 0 | X = 500 for example. 0,0 0,10 0,20... 490,0 490,10 490,20...
 			foreach (KeyValuePair<Tile, TileObject> tile in Grid
 				.Where(tile => tile.Key.X == 0 || (tile.Key.X == Cols * TileSize - TileSize) && tile.Value == null)
 				.ToList())
@@ -163,6 +165,7 @@ namespace Assets.Scripts.Managers
 				AssetsManager.PrefabType prefabType = AssetsManager.PrefabType.RoadStraight;
 				Quaternion rotation = Quaternion.Euler(0, 90f, 0);
 
+				// Calculate the rotation of the corner by checking the position in the map
 				if (tile.Key.X == Cols * TileSize - TileSize && tile.Key.Z == Rows * TileSize - TileSize)
 				{
 					rotation = Quaternion.Euler(0, 270f, 0);
@@ -183,13 +186,16 @@ namespace Assets.Scripts.Managers
 					rotation = Quaternion.Euler(0, 90f, 0);
 					prefabType = AssetsManager.PrefabType.RoadCorner;
 				}
-
+				// Spawn the road
 				GameObject gameObj = Instantiate(AssetsManager.Instance.GetPredefinedPrefab(prefabType),
 					new Vector3(tile.Key.X, 0.5f, tile.Key.Z),
 					rotation);
+
+				// Override the tile
 				Grid[tile.Key] = new TileObject {ObjectType = ObjectType.Road, GameObject = gameObj};
 			}
 
+			// Create the last road on the map
 			foreach (KeyValuePair<Tile, TileObject> tile in Grid
 				.Where(tile => (tile.Key.Z == 0 || tile.Key.Z == Rows * TileSize - TileSize) && tile.Value == null)
 				.ToList())
@@ -212,43 +218,52 @@ namespace Assets.Scripts.Managers
 		/// <param name="neighbourhoodModel"></param>
 		public void SpawnNeighbourhood(NeighbourhoodModel neighbourhoodModel)
 		{
+			// If there are no visualized objects, destroy the block
 			if (neighbourhoodModel.VisualizedObjects.Count < 1)
 			{
 				DestroyBlock(neighbourhoodModel, false);
 				return;
 			}
 
+			// Make a list of buildings
 			List<IVisualizedBuilding> visualizedObjects =
 				neighbourhoodModel.VisualizedObjects.OfType<IVisualizedBuilding>().ToList();
 
 			// Calculate total tile count we need to spawn this building (if building is wider than the TileSize)
 			int tileCount = GetTotalTilesRequired(visualizedObjects, neighbourhoodModel.Age) + 1;
 
+			// Find the amount of tiles we need to spawn this neighbourhood
 			List<Tile> tiles = FindTiles(tileCount);
+
 			if (tiles.Count != tileCount)
 			{
+				// Can't spawn the neighbourhood. Not enough tiles per street.
 				Debug.LogError(
 					"Building block went wrong. Not enough tiles!\r\nIncrease the TilesPerStreet in the config.json");
 				return;
 			}
 
+			// Set spawn offset and tile index to 0
 			float spawnOffsetX = 0;
 			int tileIndex = 0;
 			// Loop through all the visualized objects
 			for (int index = 0; index < visualizedObjects.Count; index++)
 			{
+				// Get the correct tile
 				Tile tile = tiles[tileIndex];
 				// If the tile is already filled, destroy it.
 				if (Grid[tile] != null && Grid[tile].GameObject != null)
 					Destroy(Grid[tile].GameObject);
 
+				// Spawn a building at this street
 				GameObject building = SpawnBuilding(tile, visualizedObjects[index].Size, neighbourhoodModel.Age,
 					neighbourhoodModel, visualizedObjects[index] is VisualizedStagingBuildingModel);
+				// Set the correct tile information
 				Grid[tile] = new TileObject
 					{GameObject = building, ObjectType = ObjectType.Building};
 				tileIndex++;
 
-				// Check how many tiles we need to spawsn this building
+				// Check how many tiles we need to spawn this building
 				int tilesRequired = GetTilesRequiredForBuilding(building);
 
 				// Check if we need more than 1 tile for this building
@@ -260,28 +275,35 @@ namespace Assets.Scripts.Managers
 						if (hit.transform.gameObject.CompareTag("Grass") || hit.transform.gameObject.CompareTag("Road"))
 							spawnOffsetX += hit.distance;
 					}
-
+					// We might need to move the building to align perfectly like calculated in the raycast.
 					building.transform.position = new Vector3(building.transform.position.x + spawnOffsetX,
 						building.transform.position.y, building.transform.position.z);
 					for (int i = 1; i < tilesRequired; i++)
 					{
+						// If we need more than 1 tile fill the next tiles as well
+						// This will only happen if the building is wider than the TileSize
 						Tile tile2 = tiles[tileIndex];
+						// Destroy existing object if it's not the building we are trying to spawn
 						if (Grid[tile2] != null && !Grid[tile2].GameObject.Equals(building))
 							Destroy(Grid[tile2].GameObject);
+
+						// Set the correct tile information
 						Grid[tile2] = new TileObject
 							{GameObject = building, ObjectType = ObjectType.Building};
 						tileIndex++;
 					}
 				}
-
+				// Set the correct game object in the visualized object of the neighbourhood so we can use it as reference
 				neighbourhoodModel
 					.VisualizedObjects[neighbourhoodModel.VisualizedObjects.IndexOf(visualizedObjects[index])]
 					.GameObject = building;
 			}
 
+			// Spawn a grass patch as a divider between buildings
 			GameObject grassPatch = Instantiate(
 				AssetsManager.Instance.GetPredefinedPrefab(AssetsManager.PrefabType.Grass),
 				new Vector3(tiles.Last().X, 0.5f, tiles.Last().Z), Quaternion.Euler(0, 90f, 0));
+			// Add the grass patch to the list of visualized objects
 			neighbourhoodModel.VisualizedObjects.Add(new VisualizedGrassTileModel {GameObject = grassPatch});
 
 			Grid[tiles.Last()] = new TileObject
@@ -299,6 +321,7 @@ namespace Assets.Scripts.Managers
 		/// <returns></returns>
 		public GameObject SpawnBuilding(Tile tile, int size, int age, NeighbourhoodModel neighbourhood, bool staging)
 		{
+			// Default rotation
 			Quaternion buildingRotation = Quaternion.Euler(0, 90f, 0);
 			GameObject building;
 			if (staging)
@@ -307,13 +330,16 @@ namespace Assets.Scripts.Managers
 			}
 			else
 			{
+				// Extract the tuple with the building prefab and the rotation
 				(GameObject buildingObject, float rotation) = AssetsManager.Instance.GetBuildingPrefab(size, age);
 				buildingRotation = Quaternion.Euler(0, rotation, 0);
 				building = buildingObject;
 			}
 
+			// Spawn the prefab with the correct location and rotation
 			building = Instantiate(building, new Vector3(tile.X, 0.5f, tile.Z), buildingRotation);
 
+			// Set the name of the object so we can use it later as a reference
 			building.name = $"neighbourhood-{neighbourhood.Name}";
 			return building;
 		}
@@ -328,17 +354,19 @@ namespace Assets.Scripts.Managers
 		{
 			if (visualizedObject.GameObject == null) return;
 
+			// Get the correct tile from the grid
 			List<KeyValuePair<Tile, TileObject>> gridObjects = Grid.Where(t =>
 				t.Value != null && t.Value.GameObject != null &&
 				t.Value.GameObject.Equals(visualizedObject.GameObject)).ToList();
 
 			foreach (KeyValuePair<Tile, TileObject> gridObject in gridObjects)
 			{
+				// Check if we want a destroy effect or not
 				if (visualizedObject is VisualizedStagingBuildingModel || !destroyEffect)
 					Destroy(visualizedObject.GameObject);
 				else
 					visualizedObject.GameObject.AddComponent<DestroyGridTile>().Tile = gridObject.Key;
-
+				// Set the tile to null
 				Grid[gridObject.Key] = null;
 			}
 		}
@@ -462,7 +490,7 @@ namespace Assets.Scripts.Managers
 		public int GetTilesRequiredForBuilding(GameObject building)
 		{
 			const int threshold = 1;
-			int tiles = 0;
+			int tiles = 1;
 
 			Vector3 sizeBounds = building.GetComponent<MeshFilter>().sharedMesh.bounds.size;
 
@@ -472,7 +500,6 @@ namespace Assets.Scripts.Managers
 					tiles++;
 			}
 
-			tiles++;
 			return tiles;
 		}
 

@@ -12,6 +12,7 @@ namespace Assets.Scripts.Components.Navigators
 	internal class TankNavigator : MonoBehaviour
 	{
 		public IVisualizedObject Target { get; private set; }
+
 		private NavMeshAgent _agent;
 
 		public bool HasTarget { get; private set; }
@@ -25,7 +26,16 @@ namespace Assets.Scripts.Components.Navigators
 		/// You can change the standby behavior in <see cref="SetStandby(bool)"/>
 		/// </summary>
 		public bool IsStandby { get; private set; }
+
+
+		/// <summary>
+		/// Property to see if the tank is ready to fire (will happen after rotating).
+		/// </summary>
 		public bool IsReadyToFire { get; private set; }
+		
+		/// <summary>
+		/// Property to enable or disable firing after the tank is at target.
+		/// </summary>
 		public bool IsFiringEnabled { get; set; } = false;
 
 		void Start()
@@ -34,6 +44,10 @@ namespace Assets.Scripts.Components.Navigators
 			_turret = GameObject.FindGameObjectWithTag("TankTurret");
 		}
 
+		/// <summary>
+		/// Function to set the target of the tank
+		/// </summary>
+		/// <param name="target">The GameObject of the target should not be null</param>
 		public void SetTarget(IVisualizedObject target)
 		{
 			IsStandby = false;
@@ -47,6 +61,9 @@ namespace Assets.Scripts.Components.Navigators
 			}
 		}
 
+		/// <summary>
+		/// Function to reset the target of the tank.
+		/// </summary>
 		public void RemoveTarget()
 		{
 			Target = null;
@@ -56,11 +73,13 @@ namespace Assets.Scripts.Components.Navigators
 		// Update is called once per frame
 		void Update()
 		{
+			// Check if we have a target and if we are actually at the target
 			if (HasTarget && NavigationUtil.PathComplete(_agent))
 			{
 				if (!_rotating && Target != null)
 				{
 					_agent.isStopped = true;
+					// We stopped rotating so we are ready to fire
 					if (IsFiringEnabled)
 						Fire();
 					else
@@ -82,14 +101,20 @@ namespace Assets.Scripts.Components.Navigators
 				StartCoroutine(ApiManager.Instance.KillVisualizedObject(Target));
 				if (Target.GameObject != null)
 				{
+					// Create an explosion
 					GameObject explosion = Instantiate(
 						AssetsManager.Instance.GetPredefinedPrefab(AssetsManager.PrefabType.ExplosionFx),
 						Target.GameObject.transform.position, Quaternion.identity);
+
+					// Destroy the explosion after 10 seconds since we don't want this object to stay in the world
 					Destroy(explosion, 10f);
 				}
 
+				// Set target back to null
 				Target = null;
 				HasTarget = false;
+
+				// Rotate the turret back to normal
 				StartCoroutine(Rotate(transform.eulerAngles.y));
 			}
 		}
@@ -117,6 +142,10 @@ namespace Assets.Scripts.Components.Navigators
 			_rotating = false;
 		}
 
+		/// <summary>
+		/// Function to set the tank in stand-by mode. Should be used when no valid target can be found.
+		/// </summary>
+		/// <param name="standby">Set this only to true if you want the tank to be in stand-by mode</param>
 		public void SetStandby(bool standby)
 		{
 			Target = null;

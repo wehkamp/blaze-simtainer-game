@@ -171,6 +171,7 @@ namespace Assets.Scripts.Managers
 					neighbourhoodModel.Name == neighbourhoodName);
 			if (neighbourhood != null)
 			{
+				// Update the age and layer values of the neighbourhood
 				neighbourhood.Age = updatedNeighbourhood.Age;
 				neighbourhood.LayerValues = updatedNeighbourhood.LayerValues;
 			}
