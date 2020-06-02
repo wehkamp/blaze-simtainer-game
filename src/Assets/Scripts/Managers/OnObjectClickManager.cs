@@ -27,6 +27,7 @@ namespace Assets.Scripts.Managers
 		private float _maxDistance;
 
 		public GameObject DestroyButton;
+		public GameObject OpenButton;
 
 		// Start is called before the first frame update
 		void Start()
@@ -70,6 +71,7 @@ namespace Assets.Scripts.Managers
 			if (hit)
 			{
 				DestroyButton.SetActive(false);
+				OpenButton.SetActive(false);
 				GameObject targetObject = hitInfo.transform.gameObject;
 				// Check if the object we hit has a parent, since buildings, vehicle etc don't have parents but they do have children
 				if (hitInfo.transform.parent != null)
@@ -127,6 +129,7 @@ namespace Assets.Scripts.Managers
 							if (visualizedObject is IVisualizedBuilding visualizedBuilding)
 							{
 								DestroyButton.SetActive(true);
+								OpenButton.SetActive(true);
 								if (selectedLayer != null)
 								{
 									// Only enable destroy button for buildings
@@ -237,6 +240,19 @@ namespace Assets.Scripts.Managers
 			if (_selectedObject != null)
 				StartCoroutine(ApiManager.Instance.KillVisualizedObject(_selectedObject, true));
 			InfoPanel.SetActive(false);
+		}
+
+		public void OpenSelectedObjectUrl()
+		{
+			if (!(_selectedObject is IVisualizedBuilding)) return;
+
+			NeighbourhoodModel neighbourhoodModel = CityManager.Instance.GameModel.Neighbourhoods
+				.Select(x => x).SingleOrDefault(x =>
+					x.VisualizedObjects.Contains(_selectedObject));
+			if (neighbourhoodModel != null)
+			{
+				StartCoroutine(ApiManager.Instance.OpenNeighbourhoodUrl(neighbourhoodModel.Name));
+			}
 		}
 	}
 }
