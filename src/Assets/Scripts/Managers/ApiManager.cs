@@ -161,7 +161,7 @@ namespace Assets.Scripts.Managers
 		}
 
 		/// <summary>
-		/// Function to open the web browser of the .
+		/// Function to open the web browser of the device to a specific url that belongs to a neighbourhood.
 		/// </summary>
 		/// <returns></returns>
 		public IEnumerator OpenNeighbourhoodUrl(string neighbourhoodName)
