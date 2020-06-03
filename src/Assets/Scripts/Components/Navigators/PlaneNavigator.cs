@@ -92,11 +92,11 @@ namespace Assets.Scripts.Components.Navigators
 		Tuple<Vector3, Quaternion> SelectSpawnPoint()
 		{
 			// if Z is 500, we select something between the -500 & 500
-			int[] randomZ = {_maxX * (-1), _maxX};
+			int[] randomZ = { _maxZ * (-1), _maxZ};
 			// Pick a random value between the for example -500 & 500
 			int randValue = Random.Range(0, randomZ.Length);
 			Quaternion rotation;
-			int x = Random.Range(0, 499);
+			int x = Random.Range(0, _maxX - 1);
 			int z = randomZ[randValue];
 
 			// Set the correct rotation for the plane.
@@ -116,7 +116,7 @@ namespace Assets.Scripts.Components.Navigators
 		{
 			// Check if the plane is flying out of the boundaries, if so reset the position of the plane
 			if (transform.position.z > _maxZ + 100 || transform.position.x > _maxX + 100 ||
-			    transform.position.z < -_maxX - 100 ||
+			    transform.position.z < -_maxZ - 100 ||
 			    transform.position.x < -_maxX - 100)
 			{
 				// We are crossing the border, set new a position
@@ -150,9 +150,9 @@ namespace Assets.Scripts.Components.Navigators
 			// Calculate rotation and rotate the propeller
 			if (_propeller != null)
 			{
-				Vector3 newPropellerAngles = new Vector3(_propeller.transform.eulerAngles.x + 10f,
+				Vector3 newPropellerAngles = new Vector3(_propeller.transform.eulerAngles.x,
 					_propeller.transform.eulerAngles.y,
-					_propeller.transform.eulerAngles.z);
+					_propeller.transform.eulerAngles.z + 10f);
 				_propeller.transform.eulerAngles = newPropellerAngles;
 			}
 

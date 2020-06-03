@@ -115,8 +115,30 @@ namespace Assets.Scripts.Components.Navigators
 				HasTarget = false;
 
 				// Rotate the turret back to normal
-				StartCoroutine(Rotate(transform.eulerAngles.y));
+				StartCoroutine(RotateBack());
 			}
+		}
+
+		/// <summary>
+		/// Function to rotate the tank turret back to the direction of the tank
+		/// </summary>
+		/// <returns></returns>
+		private IEnumerator RotateBack()
+		{
+			_rotating = true;
+			float startRotation = _turret.transform.eulerAngles.y;
+			float t = 0.0f;
+			while (Math.Abs(_turret.gameObject.transform.rotation.eulerAngles.y - transform.rotation.eulerAngles.y) > 0.1f)
+			{
+				t += Time.deltaTime;
+				float yRotation = Mathf.Lerp(startRotation, transform.rotation.eulerAngles.y, t / 1.5f) % 360.0f;
+				_turret.transform.eulerAngles = new Vector3(_turret.transform.eulerAngles.x, yRotation,
+					_turret.transform.eulerAngles.z);
+				yield return null;
+			}
+
+			IsReadyToFire = !IsReadyToFire;
+			_rotating = false;
 		}
 
 		/// <summary>

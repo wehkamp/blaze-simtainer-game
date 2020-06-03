@@ -311,6 +311,19 @@ namespace Assets.Scripts.Managers
 				// Add the sprite to the caching dictionary
 				_spriteCacheDictionary.Add(vehiclePrefab.Name, texture.GenerateSprite());
 			}
+
+			Texture2D planeTexture =
+				RuntimePreviewGenerator.GenerateModelPreview(
+					GetPrefab(SettingsManager.Instance.Settings.AssetBundle.Chaos.PlanePrefab)
+						.transform);
+			_spriteCacheDictionary.Add(SettingsManager.Instance.Settings.AssetBundle.Chaos.PlanePrefab,
+				planeTexture.GenerateSprite());
+			Texture2D tankTexture =
+				RuntimePreviewGenerator.GenerateModelPreview(
+					GetPrefab(SettingsManager.Instance.Settings.AssetBundle.Chaos.TankPrefab)
+						.transform);
+			_spriteCacheDictionary.Add(SettingsManager.Instance.Settings.AssetBundle.Chaos.TankPrefab,
+				tankTexture.GenerateSprite());
 		}
 
 		/// <summary>

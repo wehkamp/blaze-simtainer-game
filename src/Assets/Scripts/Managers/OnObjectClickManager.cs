@@ -29,6 +29,7 @@ namespace Assets.Scripts.Managers
 		public GameObject DestroyButton;
 		public GameObject OpenButton;
 
+		private GameObject _mainCamera;
 		// Start is called before the first frame update
 		void Start()
 		{
@@ -38,6 +39,7 @@ namespace Assets.Scripts.Managers
 			// Check with both events if renderers are removed
 			CityManager.Instance.CityUpdatedEvent.AddListener(RemovedRenderersCheck);
 			TrafficManager.Instance.TrafficUpdateEvent.AddListener(RemovedRenderersCheck);
+			_mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
 		}
 
 		/// <summary>
@@ -58,7 +60,7 @@ namespace Assets.Scripts.Managers
 		{
 			// Check if left mouse button is pressed and if there has not been clicked on an UI element
 			if (!Input.GetMouseButtonDown(0) ||
-			    UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject()) return;
+			    UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() || !_mainCamera.activeInHierarchy) return;
 
 			// Check if we have a hit on a prefab
 			bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hitInfo,

@@ -73,6 +73,7 @@ namespace Assets.Scripts.Managers
 
 			// As soon as the grid is changed we calculate the boundaries
 			GridManager.Instance.GridInitializedEvent.AddListener(CalculateMaxCameraBoundaries);
+			_lockControls = false;
 		}
 
 		void LateUpdate()

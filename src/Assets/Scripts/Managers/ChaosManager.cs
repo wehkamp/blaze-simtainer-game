@@ -6,6 +6,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using Assets.Scripts.Components.Navigators;
+using UnityEngine.UI;
 
 namespace Assets.Scripts.Managers
 {
@@ -21,6 +22,13 @@ namespace Assets.Scripts.Managers
 		private TankNavigator _tankNavigator;
 		private PlaneNavigator _planeNavigator;
 
+		private GameObject _mainCamera;
+		private GameObject _planeCamera;
+		private GameObject _tankCamera;
+
+		public Image TankUiImage;
+		public Image PlaneUiImage;
+
 		private bool _foundTargets;
 
 		private int _minimumBuildings = 2;
@@ -30,6 +38,19 @@ namespace Assets.Scripts.Managers
 		{
 			GridManager.Instance.GridInitializedEvent.AddListener(GridInitialized);
 			TeamManager.Instance.TeamSelectionChangedEvent.AddListener(TeamSelectionChanged);
+			AssetsManager.Instance.AssetsLoaded.AddListener(AssetsLoaded);
+
+			_mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
+		}
+
+		private void AssetsLoaded()
+		{
+			TankUiImage.sprite =
+				AssetsManager.Instance.GetVehicleSpritesByType(SettingsManager.Instance.Settings.AssetBundle.Chaos
+					.TankPrefab);
+			PlaneUiImage.sprite =
+				AssetsManager.Instance.GetVehicleSpritesByType(SettingsManager.Instance.Settings.AssetBundle.Chaos
+					.PlanePrefab);
 		}
 
 		/// <summary>
@@ -51,6 +72,12 @@ namespace Assets.Scripts.Managers
 						spawnPoint.Key,
 						spawnPoint.Value);
 					_tankNavigator = _tankGameObject.AddComponent<TankNavigator>();
+					_tankCamera = _tankGameObject.GetComponentInChildren<Camera>().gameObject;
+					_tankCamera.SetActive(false);
+				}
+				else
+				{
+					Destroy(TankUiImage);
 				}
 
 				if (SettingsManager.Instance.Settings.Chaos.PlaneEnabled)
@@ -61,6 +88,12 @@ namespace Assets.Scripts.Managers
 						AssetsManager.Instance.GetPredefinedPrefab(AssetsManager.PrefabType.Plane),
 						new Vector3(0f, 80f, 0f), Quaternion.Euler(0f, 90f, 0f));
 					_planeNavigator = _planeGameObject.AddComponent<PlaneNavigator>();
+					_planeCamera = _planeGameObject.GetComponentInChildren<Camera>().gameObject;
+					_planeCamera.SetActive(false);
+				}
+				else
+				{
+					Destroy(PlaneUiImage);
 				}
 
 				_minimumBuildings = SettingsManager.Instance.Settings.Chaos.MinimumBuildings;
@@ -150,6 +183,37 @@ namespace Assets.Scripts.Managers
 					visualizedObject.GameObject != null && visualizedObject is VisualizedBuildingModel);
 			_foundTargets = true;
 			return obj;
+		}
+
+		public void GoToTankCamera()
+		{
+			if (_tankCamera.activeInHierarchy)
+			{
+				ResetCamera();
+				return;
+			}
+			_mainCamera.SetActive(false);
+			_planeCamera?.SetActive(false);
+			_tankCamera?.SetActive(true);
+		}
+
+		public void GoToPlaneCamera()
+		{
+			if (_planeCamera.activeInHierarchy)
+			{
+				ResetCamera();
+				return;
+			}
+			_mainCamera.SetActive(false);
+			_tankCamera?.SetActive(false);
+			_planeCamera?.SetActive(true);
+		}
+
+		public void ResetCamera()
+		{
+			_planeCamera?.SetActive(false);
+			_tankCamera?.SetActive(false);
+			_mainCamera.SetActive(true);
 		}
 	}
 }
