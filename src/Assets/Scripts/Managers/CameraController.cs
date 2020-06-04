@@ -91,7 +91,7 @@ namespace Assets.Scripts.Managers
 		}
 
 
-		void FixedUpdate()
+		void Update()
 
 		{
 			// Controls are locked, do nothing
@@ -242,8 +242,8 @@ namespace Assets.Scripts.Managers
 
 
 			// Set the camera's position to the position of the temporary variable
-
-			Cam.fieldOfView = size;
+			if(size < ZoomMax && size > ZoomMin)
+				Cam.fieldOfView = size;
 		}
 
 		/// <summary>
