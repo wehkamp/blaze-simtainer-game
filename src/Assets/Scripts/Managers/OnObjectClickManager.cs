@@ -38,6 +38,13 @@ namespace Assets.Scripts.Managers
 			// Check with both events if renderers are removed
 			CityManager.Instance.CityUpdatedEvent.AddListener(RemovedRenderersCheck);
 			TrafficManager.Instance.TrafficUpdateEvent.AddListener(RemovedRenderersCheck);
+			CameraManager.Instance.CameraChanged.AddListener(OnCameraChanged);
+		}
+
+		private void OnCameraChanged()
+		{
+			ResetHighlighting();
+			InfoPanel.SetActive(false);
 		}
 
 		/// <summary>
@@ -48,8 +55,7 @@ namespace Assets.Scripts.Managers
 			foreach (Renderer key in _clickedObjects.Keys.ToList().Where(key => key == null))
 			{
 				_clickedObjects.Remove(key);
-				if (InfoPanel != null)
-					InfoPanel.SetActive(false);
+				InfoPanel.SetActive(false);
 			}
 		}
 
@@ -62,7 +68,8 @@ namespace Assets.Scripts.Managers
 
 
 			// Check if we have a hit on a prefab with the active camera
-			bool hit = Physics.Raycast(CameraManager.Instance.ActiveCamera.ScreenPointToRay(Input.mousePosition), out RaycastHit hitInfo,
+			bool hit = Physics.Raycast(CameraManager.Instance.ActiveCamera.ScreenPointToRay(Input.mousePosition),
+				out RaycastHit hitInfo,
 				_maxDistance,
 				_defaultLayer);
 

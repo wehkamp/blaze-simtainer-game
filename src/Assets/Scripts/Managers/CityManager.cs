@@ -127,8 +127,8 @@ namespace Assets.Scripts.Managers
 					neighbourhoodModel.Name == neighbourhoodName);
 			// Make a list of buildings we need to remove. We don't want to remove vehicles in this manager.
 			List<IVisualizedBuilding> removedBuildings =
-				neighbourhood?.VisualizedObjects.Where(
-					x => x.Identifier == identifier && x is IVisualizedBuilding).Cast<IVisualizedBuilding>().ToList();
+				neighbourhood?.VisualizedObjects.OfType<IVisualizedBuilding>().Where(
+					x => x.Identifier == identifier).ToList();
 			if (removedBuildings != null)
 			{
 				foreach (IVisualizedBuilding removedBuilding in removedBuildings)
@@ -240,9 +240,9 @@ namespace Assets.Scripts.Managers
 			}
 
 			// Check if there are buildings with the same identifier.
-			List<IVisualizedBuilding> existingVisualizedObjects = neighbourhood.VisualizedObjects.Where(x =>
-					x.Identifier == newVisualizedObject.Identifier && x is IVisualizedBuilding)
-				.Cast<IVisualizedBuilding>()
+			List<IVisualizedBuilding> existingVisualizedObjects = neighbourhood.VisualizedObjects
+				.OfType<IVisualizedBuilding>().Where(x =>
+					x.Identifier == newVisualizedObject.Identifier)
 				.ToList();
 
 			// Destroy every building that has the same identifier.

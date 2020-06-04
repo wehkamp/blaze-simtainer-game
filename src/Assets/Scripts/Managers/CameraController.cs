@@ -294,6 +294,7 @@ namespace Assets.Scripts.Managers
 		/// <param name="speed">The following speed, default .1f</param>
 		public void FollowTarget(GameObject targetObj, float speed = .1f)
 		{
+			if (!Cam.gameObject.activeInHierarchy) return;
 			_followSpeed = speed;
 			FollowTargetObject = targetObj;
 			_lockControls = true;
