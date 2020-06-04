@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -86,6 +87,7 @@ namespace Assets.Editor
 		{
 			NavMeshAgent,
 			NotWalkable,
+			Camera,
 			None
 		}
 
@@ -100,16 +102,16 @@ namespace Assets.Editor
 		private static void ApplyPropertiesToPrefab(string prefabName, string assetBundle, string tag,
 			ComponentType componentType = ComponentType.None, bool generateTransparentMaterials = false)
 		{
-			string[] strings = AssetDatabase.FindAssets(prefabName);
+			string[] assetGuids = AssetDatabase.FindAssets(prefabName);
 
-			for (int i = 0; i < strings.Length; i++)
+			foreach (string assetGuid in assetGuids)
 			{
-				string assetPath = AssetDatabase.GUIDToAssetPath(strings[i]);
+				string assetPath = AssetDatabase.GUIDToAssetPath(assetGuid);
 				// Match exact name of prefab
 				if (Path.GetFileName(assetPath) != prefabName + ".prefab") continue;
 				Debug.Log($"Handling {prefabName}");
 				GameObject targetGameObject =
-					PrefabUtility.LoadPrefabContents(AssetDatabase.GUIDToAssetPath(strings[i]));
+					PrefabUtility.LoadPrefabContents(AssetDatabase.GUIDToAssetPath(assetGuid));
 
 				if (targetGameObject == null)
 				{
@@ -120,91 +122,87 @@ namespace Assets.Editor
 				// Already done this one
 				if (targetGameObject.CompareTag(tag)) continue;
 
+				// Mark the object as a dirty object so we can edit it
 				EditorUtility.SetDirty(targetGameObject);
 				PrefabUtility.RecordPrefabInstancePropertyModifications(targetGameObject);
-				switch (componentType)
-				{
-					case ComponentType.NavMeshAgent:
-						if (targetGameObject.GetComponent<NavMeshAgent>() == null)
-						{
-							NavMeshAgent n = targetGameObject.AddComponent<NavMeshAgent>();
-							n.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
-							n.avoidancePriority = 0;
-							n.baseOffset = 0.1f;
-							n.radius = 1.0f;
-						}
 
-						break;
-					case ComponentType.NotWalkable:
-						if (targetGameObject.GetComponent<NavMeshModifier>() == null)
-						{
-							NavMeshModifier navMeshModifier = targetGameObject.AddComponent<NavMeshModifier>();
-							navMeshModifier.overrideArea = true;
-							navMeshModifier.area = NavMesh.GetAreaFromName("Not Walkable");
-						}
-
-						break;
-				}
-
+				// Set the correct tag of the object
 				targetGameObject.tag = tag;
 
+				AddComponent(componentType, targetGameObject);
 
 				Renderer[] renders = targetGameObject.GetComponents<Renderer>();
-				foreach (Renderer t in renders)
-				{
-					if (t.sharedMaterial == null) continue;
-					ApplyMaterialProperties(assetBundle, t.sharedMaterial);
-
-					if (generateTransparentMaterials)
-					{
-						CreateTransparentMaterial(assetBundle, t.sharedMaterial);
-					}
-				}
-
 				Renderer[] childRenderers = targetGameObject.GetComponentsInChildren<Renderer>();
-				foreach (Renderer t in childRenderers)
-				{
-					if (t.sharedMaterial == null) continue;
-					ApplyMaterialProperties(assetBundle, t.sharedMaterial);
 
-					if (generateTransparentMaterials)
-					{
-						CreateTransparentMaterial(assetBundle, t.sharedMaterial);
-					}
-				}
+				FixRenderers(renders, assetBundle, generateTransparentMaterials);
+				FixRenderers(childRenderers, assetBundle, generateTransparentMaterials);
 
 				// Finally save the asset. Unload the scene, destroy the objects
-				PrefabUtility.SaveAsPrefabAsset(targetGameObject, assetPath);
-				SetAssetBundles(assetBundle, assetPath);
-				PrefabUtility.UnloadPrefabContents(targetGameObject);
-				AsyncOperation unloading = SceneManager.UnloadSceneAsync(SceneManager.GetActiveScene(),
-					UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
+				FinishObject(targetGameObject, assetBundle, assetPath);
+			}
+		}
 
-				int ticks = 0;
-				while (unloading != null && !unloading.isDone && ticks < 30)
+		private static void FinishObject(GameObject targetGameObject, string assetBundle, string assetPath)
+		{
+			PrefabUtility.SaveAsPrefabAsset(targetGameObject, assetPath);
+			SetAssetBundles(assetBundle, assetPath);
+			PrefabUtility.UnloadPrefabContents(targetGameObject);
+			AsyncOperation unloading = SceneManager.UnloadSceneAsync(SceneManager.GetActiveScene(),
+				UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
+
+			int ticks = 0;
+			while (unloading != null && !unloading.isDone && ticks < 30)
+			{
+				Thread.Sleep(100);
+				ticks++;
+			}
+		}
+
+		/// <summary>
+		/// Function to apply all material properties of the given renderers.
+		/// </summary>
+		/// <param name="renderers"></param>
+		/// <param name="assetBundle"></param>
+		/// <param name="generateTransparentMaterials"></param>
+		private static void FixRenderers(IEnumerable<Renderer> renderers, string assetBundle, bool generateTransparentMaterials)
+		{
+			foreach (Renderer renderer in renderers)
+			{
+				if (renderer.sharedMaterial == null) continue;
+
+				// Apply all material properties
+				ApplyMaterialProperties(assetBundle, renderer.sharedMaterial);
+
+				// Generate a transparent material if required
+				if (generateTransparentMaterials)
 				{
-					Thread.Sleep(100);
-					ticks++;
+					CreateTransparentMaterial(assetBundle, renderer.sharedMaterial);
 				}
 			}
 		}
 
-		private static void ApplyMaterialProperties(string assetBundleName, Material m)
+		/// <summary>
+		/// Function to apply default properties to a material.
+		/// </summary>
+		/// <param name="assetBundleName"></param>
+		/// <param name="material"></param>
+		private static void ApplyMaterialProperties(string assetBundleName, Material material)
 		{
-			if (m.enableInstancing) return;
-			EditorUtility.SetDirty(m);
-			m.enableInstancing = true;
-			SetAssetBundles(assetBundleName, AssetDatabase.GetAssetPath(m.GetInstanceID()));
+			if (material.enableInstancing) return;
+			EditorUtility.SetDirty(material);
+			material.enableInstancing = true;
+			SetAssetBundles(assetBundleName, AssetDatabase.GetAssetPath(material.GetInstanceID()));
 		}
 
 		/// <summary>
 		/// Function to create a transparent material based on an existing material
 		/// </summary>
 		/// <param name="assetBundleName"></param>
-		/// <param name="m"></param>
-		private static void CreateTransparentMaterial(string assetBundleName, Material m)
+		/// <param name="originalMaterial"></param>
+		private static void CreateTransparentMaterial(string assetBundleName, Material originalMaterial)
 		{
-			string path = AssetDatabase.GetAssetPath(m);
+			// Get the original path of the material
+			string path = AssetDatabase.GetAssetPath(originalMaterial);
 
 			string newFileName = path.Split('/').Last().Insert(0, "Transparent-");
 
@@ -216,10 +214,12 @@ namespace Assets.Editor
 				return;
 			}
 
-			Material newMaterial = new Material(Shader.Find(m.shader.name));
+			Material newMaterial = new Material(Shader.Find(originalMaterial.shader.name));
 
-			newMaterial.CopyPropertiesFromMaterial(m);
+			// Copy the properties from the original material
+			newMaterial.CopyPropertiesFromMaterial(originalMaterial);
 
+			// Set new properties of material to enable transparency
 			newMaterial.SetInt("_SrcBlend", (int) UnityEngine.Rendering.BlendMode.SrcAlpha);
 			newMaterial.SetInt("_DstBlend", (int) UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
 			newMaterial.SetInt("_ZWrite", 0);
@@ -229,7 +229,11 @@ namespace Assets.Editor
 			newMaterial.color = new Color(newMaterial.color.r, newMaterial.color.g, newMaterial.color.b, 0.3f);
 			newMaterial.renderQueue = 3000;
 			newMaterial.enableInstancing = true;
+
+			// Finally create the material as an asset
 			AssetDatabase.CreateAsset(newMaterial, newPath);
+
+			// And set the correct asset bundle of the material
 			SetAssetBundles(assetBundleName, newPath);
 		}
 
@@ -242,6 +246,77 @@ namespace Assets.Editor
 		{
 			if (!string.IsNullOrEmpty(assetPath) && !string.IsNullOrEmpty(assetBundleName))
 				AssetImporter.GetAtPath(assetPath).SetAssetBundleNameAndVariant(assetBundleName, "");
+		}
+
+		/// <summary>
+		/// Add a component to a game object based on the component type
+		/// </summary>
+		/// <param name="componentType"></param>
+		/// <param name="targetGameObject"></param>
+		private static void AddComponent(ComponentType componentType, GameObject targetGameObject)
+		{
+			switch (componentType)
+			{
+				case ComponentType.NavMeshAgent:
+					if (targetGameObject.GetComponent<NavMeshAgent>() == null)
+					{
+						NavMeshAgent n = targetGameObject.AddComponent<NavMeshAgent>();
+						n.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
+						n.avoidancePriority = 0;
+						n.baseOffset = 0.1f;
+						n.radius = 1.0f;
+					}
+
+					break;
+				case ComponentType.NotWalkable:
+					if (targetGameObject.GetComponent<NavMeshModifier>() == null)
+					{
+						NavMeshModifier navMeshModifier = targetGameObject.AddComponent<NavMeshModifier>();
+						navMeshModifier.overrideArea = true;
+						navMeshModifier.area = NavMesh.GetAreaFromName("Not Walkable");
+					}
+
+					break;
+				case ComponentType.Camera:
+					// These camera settings are based on the paid assets pack
+					if (targetGameObject.GetComponent<Camera>() == null)
+					{
+						GameObject cameraObject = new GameObject();
+
+						Camera camera = cameraObject.AddComponent<Camera>();
+						camera.clearFlags = CameraClearFlags.Color;
+						// Set default background color
+						camera.backgroundColor = new Color32(88, 85, 74, 255);
+						camera.orthographic = false;
+
+						Vector3 defaultPositionForPaidAssetPack = Vector3.zero;
+						Quaternion defaultRotationForPaidAssetPack = Quaternion.Euler(0, 0, 0);
+						float defaultFieldOfViewForPaidAssetPack = 0f;
+						switch (targetGameObject.tag)
+						{
+							case "Plane":
+								cameraObject.tag = "PlaneCamera";
+
+								defaultPositionForPaidAssetPack = new Vector3(-0.88f, 25.1f, -4.7f);
+								defaultRotationForPaidAssetPack = Quaternion.Euler(70, 0, 0);
+								defaultFieldOfViewForPaidAssetPack = 47.1f;
+								break;
+							case "Tank":
+								cameraObject.tag = "TankCamera";
+
+								defaultPositionForPaidAssetPack = new Vector3(-1.08f, 1f, 0.23f);
+								defaultFieldOfViewForPaidAssetPack = 60f;
+								break;
+						}
+
+						cameraObject.transform.position = defaultPositionForPaidAssetPack;
+						cameraObject.transform.rotation = defaultRotationForPaidAssetPack;
+						camera.fieldOfView = defaultFieldOfViewForPaidAssetPack;
+						cameraObject.transform.SetParent(targetGameObject.transform);
+					}
+
+					break;
+			}
 		}
 	}
 }

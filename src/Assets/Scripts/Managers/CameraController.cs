@@ -73,6 +73,7 @@ namespace Assets.Scripts.Managers
 
 			// As soon as the grid is changed we calculate the boundaries
 			GridManager.Instance.GridInitializedEvent.AddListener(CalculateMaxCameraBoundaries);
+			_lockControls = false;
 		}
 
 		void LateUpdate()
@@ -90,14 +91,14 @@ namespace Assets.Scripts.Managers
 		}
 
 
-		void FixedUpdate()
+		void Update()
 
 		{
 			// Controls are locked, do nothing
 
 
 			// Check if user is focused on an UI-element
-			if (EventSystem.current.IsPointerOverGameObject()) return;
+			if (EventSystem.current.IsPointerOverGameObject() || !Cam.gameObject.activeInHierarchy) return;
 
 			// Zoom and rotation is allowed of controls are locked
 			Rotation();
@@ -241,8 +242,8 @@ namespace Assets.Scripts.Managers
 
 
 			// Set the camera's position to the position of the temporary variable
-
-			Cam.fieldOfView = size;
+			if(size < ZoomMax && size > ZoomMin)
+				Cam.fieldOfView = size;
 		}
 
 		/// <summary>
@@ -293,6 +294,7 @@ namespace Assets.Scripts.Managers
 		/// <param name="speed">The following speed, default .1f</param>
 		public void FollowTarget(GameObject targetObj, float speed = .1f)
 		{
+			if (!Cam.gameObject.activeInHierarchy) return;
 			_followSpeed = speed;
 			FollowTargetObject = targetObj;
 			_lockControls = true;

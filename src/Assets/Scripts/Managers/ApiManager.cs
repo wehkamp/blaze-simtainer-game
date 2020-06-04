@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Runtime.InteropServices;
 using Assets.Scripts.Interfaces;
 using Assets.Scripts.Models;
 using Assets.Scripts.Utils;
@@ -181,7 +182,11 @@ namespace Assets.Scripts.Managers
 					string url = JsonParser.ParseNeighbourhoodUrl(webRequest.downloadHandler.text);
 					if (!string.IsNullOrEmpty(url))
 					{
+#if UNITY_WEBGL && !UNITY_EDITOR
+						openPage(url);
+#else
 						Application.OpenURL(url);
+#endif
 					}
 				}
 
@@ -200,5 +205,8 @@ namespace Assets.Scripts.Managers
 			Debug.Log("Disconnecting from server.");
 			_srLib.Exit();
 		}
+
+		[DllImport("__Internal")]
+		private static extern void openPage(string url);
 	}
 }

@@ -34,6 +34,7 @@ namespace Assets.Scripts.Managers
 		void Start()
 		{
 			SettingsManager.Instance.SettingsLoadedEvent.AddListener(SettingsLoaded);
+			RuntimePreviewGenerator.BackgroundColor = new Color(0.3f,0.3f,0.3f,0.1f);
 		}
 
 		private IEnumerator LoadAssetBundle(string url)
@@ -311,6 +312,19 @@ namespace Assets.Scripts.Managers
 				// Add the sprite to the caching dictionary
 				_spriteCacheDictionary.Add(vehiclePrefab.Name, texture.GenerateSprite());
 			}
+
+			Texture2D planeTexture =
+				RuntimePreviewGenerator.GenerateModelPreview(
+					GetPrefab(SettingsManager.Instance.Settings.AssetBundle.Chaos.PlanePrefab)
+						.transform);
+			_spriteCacheDictionary.Add(SettingsManager.Instance.Settings.AssetBundle.Chaos.PlanePrefab,
+				planeTexture.GenerateSprite());
+			Texture2D tankTexture =
+				RuntimePreviewGenerator.GenerateModelPreview(
+					GetPrefab(SettingsManager.Instance.Settings.AssetBundle.Chaos.TankPrefab)
+						.transform);
+			_spriteCacheDictionary.Add(SettingsManager.Instance.Settings.AssetBundle.Chaos.TankPrefab,
+				tankTexture.GenerateSprite());
 		}
 
 		/// <summary>

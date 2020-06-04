@@ -38,6 +38,13 @@ namespace Assets.Scripts.Managers
 			// Check with both events if renderers are removed
 			CityManager.Instance.CityUpdatedEvent.AddListener(RemovedRenderersCheck);
 			TrafficManager.Instance.TrafficUpdateEvent.AddListener(RemovedRenderersCheck);
+			CameraManager.Instance.CameraChanged.AddListener(OnCameraChanged);
+		}
+
+		private void OnCameraChanged()
+		{
+			ResetHighlighting();
+			InfoPanel.SetActive(false);
 		}
 
 		/// <summary>
@@ -48,8 +55,7 @@ namespace Assets.Scripts.Managers
 			foreach (Renderer key in _clickedObjects.Keys.ToList().Where(key => key == null))
 			{
 				_clickedObjects.Remove(key);
-				if (InfoPanel != null)
-					InfoPanel.SetActive(false);
+				InfoPanel.SetActive(false);
 			}
 		}
 
@@ -60,8 +66,10 @@ namespace Assets.Scripts.Managers
 			if (!Input.GetMouseButtonDown(0) ||
 			    UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject()) return;
 
-			// Check if we have a hit on a prefab
-			bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hitInfo,
+
+			// Check if we have a hit on a prefab with the active camera
+			bool hit = Physics.Raycast(CameraManager.Instance.ActiveCamera.ScreenPointToRay(Input.mousePosition),
+				out RaycastHit hitInfo,
 				_maxDistance,
 				_defaultLayer);
 
@@ -180,8 +188,9 @@ namespace Assets.Scripts.Managers
 						NeighbourhoodModel neighbourhoodModel = CityManager.Instance.GameModel.Neighbourhoods
 							.Select(x => x).SingleOrDefault(x =>
 								x.VisualizedObjects.Contains(tankNavigator.Target));
+						string firingEnabled = tankNavigator.IsFiringEnabled ? "yes" : "no";
 						if (neighbourhoodModel != null)
-							infoText = $"Target: {neighbourhoodModel.Name}";
+							infoText = $"Target: {neighbourhoodModel.Name}\r\nFiring enabled: {firingEnabled}";
 					}
 				}
 				else

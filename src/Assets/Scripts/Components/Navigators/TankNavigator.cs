@@ -5,6 +5,7 @@ using Assets.Scripts.Managers;
 using Assets.Scripts.Utils;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Events;
 
 namespace Assets.Scripts.Components.Navigators
 {
@@ -19,6 +20,7 @@ namespace Assets.Scripts.Components.Navigators
 
 		private GameObject _turret;
 
+
 		private bool _rotating = false;
 
 		/// <summary>
@@ -32,7 +34,7 @@ namespace Assets.Scripts.Components.Navigators
 		/// Property to see if the tank is ready to fire (will happen after rotating).
 		/// </summary>
 		public bool IsReadyToFire { get; private set; }
-		
+
 		/// <summary>
 		/// Property to enable or disable firing after the tank is at target.
 		/// </summary>
@@ -58,6 +60,7 @@ namespace Assets.Scripts.Components.Navigators
 				_agent.isStopped = false;
 				_agent.SetDestination(target.GameObject.transform.position);
 				HasTarget = true;
+				ChaosManager.Instance.TankTargetChanged.Invoke(target.GameObject.name.Replace("neighbourhood-", ""));
 			}
 		}
 
@@ -68,6 +71,7 @@ namespace Assets.Scripts.Components.Navigators
 		{
 			Target = null;
 			HasTarget = false;
+			ChaosManager.Instance.TankTargetChanged.Invoke(null);
 		}
 
 		// Update is called once per frame
@@ -76,6 +80,7 @@ namespace Assets.Scripts.Components.Navigators
 			// Check if we have a target and if we are actually at the target
 			if (HasTarget && NavigationUtil.PathComplete(_agent))
 			{
+
 				if (!_rotating && Target != null)
 				{
 					_agent.isStopped = true;
@@ -115,8 +120,31 @@ namespace Assets.Scripts.Components.Navigators
 				HasTarget = false;
 
 				// Rotate the turret back to normal
-				StartCoroutine(Rotate(transform.eulerAngles.y));
+				StartCoroutine(RotateBack());
 			}
+		}
+
+		/// <summary>
+		/// Function to rotate the tank turret back to the direction of the tank
+		/// </summary>
+		/// <returns></returns>
+		private IEnumerator RotateBack()
+		{
+			_rotating = true;
+			float startRotation = _turret.transform.eulerAngles.y;
+			float t = 0.0f;
+			while (Math.Abs(_turret.gameObject.transform.rotation.eulerAngles.y - transform.rotation.eulerAngles.y) >
+			       0.1f)
+			{
+				t += Time.deltaTime;
+				float yRotation = Mathf.Lerp(startRotation, transform.rotation.eulerAngles.y, t / 1.5f) % 360.0f;
+				_turret.transform.eulerAngles = new Vector3(_turret.transform.eulerAngles.x, yRotation,
+					_turret.transform.eulerAngles.z);
+				yield return null;
+			}
+
+			IsReadyToFire = !IsReadyToFire;
+			_rotating = false;
 		}
 
 		/// <summary>
@@ -148,10 +176,11 @@ namespace Assets.Scripts.Components.Navigators
 		/// <param name="standby">Set this only to true if you want the tank to be in stand-by mode</param>
 		public void SetStandby(bool standby)
 		{
+			IsStandby = standby;
 			Target = null;
 			HasTarget = false;
 			_agent.ResetPath();
-			IsStandby = standby;
+			ChaosManager.Instance.TankTargetChanged.Invoke(null);
 		}
 	}
 }
