@@ -3,7 +3,6 @@ using System.Linq;
 using Assets.Scripts.Interfaces;
 using Assets.Scripts.Managers;
 using Assets.Scripts.Utils;
-using TMPro;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -31,8 +30,6 @@ namespace Assets.Scripts.Components.Navigators
 
 		private GameObject _propeller;
 
-		private TMP_Text _topText;
-
 		// Do a barrel roll
 		private bool _barrelRoll;
 
@@ -49,22 +46,6 @@ namespace Assets.Scripts.Components.Navigators
 		/// Amount of buildings that must exists before we drop a bomb on a neighbourhood.
 		/// </summary>
 		public int MinimumBuildings = 2;
-
-
-		private bool _enableTopText = false;
-
-		/// <summary>
-		/// Property to display the text in the top to show info about the plane
-		/// </summary>
-		public bool EnableTopText
-		{
-			get => _enableTopText;
-			set
-			{
-				_topText.text = value ? "Scanning for targets" : "";
-				_enableTopText = value;
-			}
-		}
 
 		// Start is called before the first frame update
 		void Start()
@@ -93,7 +74,6 @@ namespace Assets.Scripts.Components.Navigators
 
 			// Set the minimum Buildings required for chaos
 			MinimumBuildings = SettingsManager.Instance.Settings.Chaos.MinimumBuildings;
-			_topText = GameObject.FindGameObjectWithTag("TopText").GetComponent<TMP_Text>();
 		}
 
 		public void ToggleBarrelRoll()
@@ -148,10 +128,7 @@ namespace Assets.Scripts.Components.Navigators
 				// Reset fired for this path
 				_fired = false;
 
-				if (_enableTopText)
-				{
-					_topText.text = "Scanning for targets";
-				}
+				ChaosManager.Instance.PlaneTargetChangedEvent.Invoke(null);
 			}
 		}
 
@@ -195,16 +172,13 @@ namespace Assets.Scripts.Components.Navigators
 					.Single(x => x.Name == hit.collider.gameObject.name.Replace("neighbourhood-", ""))
 					.VisualizedObjects.Count(x => x is IVisualizedBuilding) >= MinimumBuildings)
 				{
-					if (_enableTopText)
-					{
-						_topText.text = $"Target found! Dropped a bomb at \r\n{hit.collider.gameObject.name.Replace("neighbourhood-", "")}";
-					}
-
 					// We met the requirements Drop a bomb on the building
 					_fired = true;
 					Instantiate(AssetsManager.Instance.GetPredefinedPrefab(AssetsManager.PrefabType.Bomb),
 						new Vector3(hit.collider.gameObject.transform.position.x, transform.position.y,
 							hit.collider.gameObject.transform.position.z), Quaternion.identity);
+					ChaosManager.Instance.PlaneTargetChangedEvent.Invoke(
+						hit.collider.gameObject.name.Replace("neighbourhood-", ""));
 				}
 			}
 		}

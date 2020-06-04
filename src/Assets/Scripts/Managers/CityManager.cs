@@ -36,7 +36,14 @@ namespace Assets.Scripts.Managers
 		{
 			if (Input.GetKeyDown(KeyCode.Escape))
 			{
-				SceneManager.LoadScene("MainMenu");
+				if (CameraManager.Instance.ActiveCamera != CameraManager.CameraType.MainCamera)
+				{
+					CameraManager.Instance.SwitchCamera(CameraManager.CameraType.MainCamera);
+				}
+				else
+				{
+					SceneManager.LoadScene("MainMenu");
+				}
 			}
 		}
 
@@ -234,7 +241,9 @@ namespace Assets.Scripts.Managers
 
 			// Check if there are buildings with the same identifier.
 			List<IVisualizedBuilding> existingVisualizedObjects = neighbourhood.VisualizedObjects.Where(x =>
-				x.Identifier == newVisualizedObject.Identifier && x is IVisualizedBuilding).Cast<IVisualizedBuilding>().ToList();
+					x.Identifier == newVisualizedObject.Identifier && x is IVisualizedBuilding)
+				.Cast<IVisualizedBuilding>()
+				.ToList();
 
 			// Destroy every building that has the same identifier.
 			foreach (IVisualizedBuilding visualizedObject in existingVisualizedObjects)

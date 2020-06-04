@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections;
-using System.Linq;
 using Assets.Scripts.Interfaces;
 using Assets.Scripts.Managers;
-using Assets.Scripts.Models;
 using Assets.Scripts.Utils;
-using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Events;
 
 namespace Assets.Scripts.Components.Navigators
 {
@@ -22,7 +20,6 @@ namespace Assets.Scripts.Components.Navigators
 
 		private GameObject _turret;
 
-		private TMP_Text _topText;
 
 		private bool _rotating = false;
 
@@ -43,49 +40,12 @@ namespace Assets.Scripts.Components.Navigators
 		/// </summary>
 		public bool IsFiringEnabled { get; set; } = false;
 
-		private bool _enableTopText = false;
-
-		/// <summary>
-		/// Property to display the text in the top to show info about the tank
-		/// </summary>
-		public bool EnableTopText
-		{
-			get => _enableTopText;
-			set
-			{
-				if (value)
-				{
-					if (Target != null)
-					{
-						NeighbourhoodModel neighbourhoodModel = CityManager.Instance.GameModel.Neighbourhoods
-							.Select(x => x).SingleOrDefault(x =>
-								x.VisualizedObjects.Contains(Target));
-						if (neighbourhoodModel != null)
-							_topText.text = $"Target: {neighbourhoodModel.Name}";
-					}
-					else if (IsStandby)
-					{
-						_topText.text = "Stand-by mode";
-					}
-					else
-					{
-						_topText.text = "Scanning for targets";
-					}
-				}
-				else
-				{
-					_topText.text = "";
-				}
-
-				_enableTopText = value;
-			}
-		}
+		public UnityEvent ReachedTarget;
 
 		void Start()
 		{
 			_agent = GetComponent<NavMeshAgent>();
 			_turret = GameObject.FindGameObjectWithTag("TankTurret");
-			_topText = GameObject.FindGameObjectWithTag("TopText").GetComponent<TMP_Text>();
 		}
 
 		/// <summary>
@@ -102,10 +62,7 @@ namespace Assets.Scripts.Components.Navigators
 				_agent.isStopped = false;
 				_agent.SetDestination(target.GameObject.transform.position);
 				HasTarget = true;
-				if (_enableTopText)
-				{
-					_topText.text = "Target found";
-				}
+				ChaosManager.Instance.TankTargetChanged.Invoke(target.GameObject.name.Replace("neighbourhood-", ""));
 			}
 		}
 
@@ -116,6 +73,7 @@ namespace Assets.Scripts.Components.Navigators
 		{
 			Target = null;
 			HasTarget = false;
+			ChaosManager.Instance.TankTargetChanged.Invoke(null);
 		}
 
 		// Update is called once per frame
@@ -124,10 +82,6 @@ namespace Assets.Scripts.Components.Navigators
 			// Check if we have a target and if we are actually at the target
 			if (HasTarget && NavigationUtil.PathComplete(_agent))
 			{
-				if (_enableTopText)
-				{
-					_topText.text = "Arrived at target";
-				}
 
 				if (!_rotating && Target != null)
 				{
@@ -224,14 +178,11 @@ namespace Assets.Scripts.Components.Navigators
 		/// <param name="standby">Set this only to true if you want the tank to be in stand-by mode</param>
 		public void SetStandby(bool standby)
 		{
+			IsStandby = standby;
 			Target = null;
 			HasTarget = false;
 			_agent.ResetPath();
-			IsStandby = standby;
-			if (_enableTopText)
-			{
-				_topText.text = "Stand-by";
-			}
+			ChaosManager.Instance.TankTargetChanged.Invoke(null);
 		}
 	}
 }

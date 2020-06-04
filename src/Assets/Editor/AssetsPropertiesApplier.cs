@@ -146,30 +146,41 @@ namespace Assets.Editor
 
 						break;
 					case ComponentType.Camera:
+						// These camera settings are based on the paid assets pack
 						if (targetGameObject.GetComponent<Camera>() == null)
 						{
 							GameObject cameraObject = new GameObject();
 
 							Camera camera = cameraObject.AddComponent<Camera>();
 							camera.clearFlags = CameraClearFlags.Color;
+							// Set default background color
 							camera.backgroundColor = new Color32(88, 85, 74, 255);
 							camera.orthographic = false;
+
+							Vector3 defaultPositionForPaidAssetPack = Vector3.zero;
+							Quaternion defaultRotationForPaidAssetPack = Quaternion.Euler(0,0,0);
+							float defaultFieldOfViewForPaidAssetPack = 0f;
 							switch (tag)
 							{
+
 								case "Plane":
 									cameraObject.tag = "PlaneCamera";
-									cameraObject.transform.position = new Vector3(-0.88f, 25.1f, -4.7f);
-									cameraObject.transform.rotation = Quaternion.Euler(70, 0, 0);
-									camera.fieldOfView = 47.1f;
+
+									defaultPositionForPaidAssetPack = new Vector3(-0.88f, 25.1f, -4.7f);
+									defaultRotationForPaidAssetPack = Quaternion.Euler(70, 0, 0);
+									defaultFieldOfViewForPaidAssetPack = 47.1f;
 									break;
 								case "Tank":
 									cameraObject.tag = "TankCamera";
-									cameraObject.transform.position = new Vector3(-1.08f, 1f, 0.23f);
-									cameraObject.transform.rotation = Quaternion.Euler(0, 0, 0);
-									camera.fieldOfView = 60f;
+
+									defaultPositionForPaidAssetPack = new Vector3(-1.08f, 1f, 0.23f);
+									defaultFieldOfViewForPaidAssetPack = 60f;
 									break;
 							}
 
+							cameraObject.transform.position = defaultPositionForPaidAssetPack;
+							cameraObject.transform.rotation = defaultRotationForPaidAssetPack;
+							camera.fieldOfView = defaultFieldOfViewForPaidAssetPack;
 							cameraObject.transform.SetParent(targetGameObject.transform);
 						}
 
