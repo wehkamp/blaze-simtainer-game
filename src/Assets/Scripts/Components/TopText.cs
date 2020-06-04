@@ -49,7 +49,7 @@ namespace Assets.Scripts.Components
 		/// </summary>
 		private void UpdateTextByActiveCamera()
 		{
-			switch (CameraManager.Instance.ActiveCamera)
+			switch (CameraManager.Instance.ActiveCameraType)
 			{
 				case CameraManager.CameraType.PlaneCamera:
 					_text.text = _planeText;

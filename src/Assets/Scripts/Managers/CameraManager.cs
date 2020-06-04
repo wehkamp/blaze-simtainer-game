@@ -15,7 +15,14 @@ namespace Assets.Scripts.Managers
 
 		public UnityEvent CameraChanged;
 
-		public CameraType ActiveCamera;
+		public CameraType ActiveCameraType;
+		public Camera ActiveCamera;
+
+		void Start()
+		{
+			ActiveCamera = MainCamera;
+			ActiveCameraType = CameraType.MainCamera;
+		}
 
 		public void SwitchCamera(CameraType cameraType)
 		{
@@ -27,23 +34,27 @@ namespace Assets.Scripts.Managers
 					if (TankCamera != null)
 						TankCamera.gameObject.SetActive(false);
 					MainCamera.gameObject.SetActive(true);
+					ActiveCamera = MainCamera;
 					break;
 				case CameraType.PlaneCamera:
 					MainCamera.gameObject.SetActive(false);
 					if (TankCamera != null)
 						TankCamera.gameObject.SetActive(false);
 					PlaneCamera.gameObject.SetActive(true);
+					ActiveCamera = PlaneCamera;
 					break;
 				case CameraType.TankCamera:
 					MainCamera.gameObject.SetActive(false);
 					if (PlaneCamera != null)
 						PlaneCamera.gameObject.SetActive(false);
 					TankCamera.gameObject.SetActive(true);
+					ActiveCamera = TankCamera;
 					break;
 				default:
 					throw new ArgumentOutOfRangeException(nameof(cameraType), cameraType, null);
 			}
-			ActiveCamera = cameraType;
+
+			ActiveCameraType = cameraType;
 			CameraChanged?.Invoke();
 		}
 

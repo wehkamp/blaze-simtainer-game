@@ -63,7 +63,7 @@ If you want to use these assets, read chapter 5.1
 | A / Left Arrow         | Move the camera to the left                                     |
 | S / Down Arrow         | Move the camera backwards                                       |
 | D / Right Arrow        | Move the camera to the right                                    |
-| Escape                 | Go back to the main menu                                        |
+| Escape                 | Go back to the main menu or escape different camera view        |
 | F4                     | Open the debug console                                          |
 | Left mouse button      | When clicked on a building or vehicle it displays information   |
 | Hold right mouse button| Rotate the camera around                                        |
@@ -566,19 +566,21 @@ For example, for the scooter the following settings were used:
 | Auto Re-path            | Enabled        |
 | Area Mask               | Walkable       |
 
+5. If the prefab is a tank or a plane, add a camera to the object, align it correctly and give it the correct Tag `TankCamera` or `PlaneCamera`.
+
 ## Important! Buildings & Vehicles
 
 These steps are necessary only if you intend to use the team selection.
 
 **The material must not contain any white spaces.**
 
-5. Place the material you used in the Resources/Materials folder.
+6. Place the material you used in the Resources/Materials folder.
 
-6. Duplicate the material and rename the duplicated material to **Transparent-** *Material name*. (I know this is not a really nice thing, but it's because of WebGL limitations)
+7. Duplicate the material and rename the duplicated material to **Transparent-** *Material name*. (I know this is not a really nice thing, but it's because of WebGL limitations)
 
-7. Set the Rendering mode to **Fade** of the transparent material.
+8. Set the Rendering mode to **Fade** of the transparent material.
 
-8. Edit the `config.json` and set all the prefabs to the correct names.
+9. Edit the `config.json` and set all the prefabs to the correct names.
 
 For performance reasons it is advised to **enable** GPU instancing for the transparent material and the original prefab material.
 

@@ -182,7 +182,7 @@ namespace Assets.Scripts.Managers
 					string url = JsonParser.ParseNeighbourhoodUrl(webRequest.downloadHandler.text);
 					if (!string.IsNullOrEmpty(url))
 					{
-#if UNITY_WEBGL
+#if UNITY_WEBGL && !UNITY_EDITOR
 						openPage(url);
 #else
 						Application.OpenURL(url);

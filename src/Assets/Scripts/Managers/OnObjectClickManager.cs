@@ -63,14 +63,9 @@ namespace Assets.Scripts.Managers
 			if (!Input.GetMouseButtonDown(0) ||
 			    UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject()) return;
 
-			if (!_mainCamera.activeInHierarchy)
-			{
-				ResetHighlighting();
-				return;
-			}
 
-			// Check if we have a hit on a prefab
-			bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hitInfo,
+			// Check if we have a hit on a prefab with the active camera
+			bool hit = Physics.Raycast(CameraManager.Instance.ActiveCamera.ScreenPointToRay(Input.mousePosition), out RaycastHit hitInfo,
 				_maxDistance,
 				_defaultLayer);
 

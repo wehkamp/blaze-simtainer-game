@@ -56,7 +56,7 @@ namespace Assets.Scripts.Managers
 		{
 			Color planeUiColor = Color.white;
 			Color tankUiColor = Color.white;
-			switch (CameraManager.Instance.ActiveCamera)
+			switch (CameraManager.Instance.ActiveCameraType)
 			{
 				case CameraManager.CameraType.PlaneCamera:
 					planeUiColor = Color.green;
@@ -216,7 +216,7 @@ namespace Assets.Scripts.Managers
 
 		public void GoToTankCamera()
 		{
-			if (CameraManager.Instance.ActiveCamera == CameraManager.CameraType.TankCamera)
+			if (CameraManager.Instance.ActiveCameraType == CameraManager.CameraType.TankCamera)
 			{
 				CameraManager.Instance.SwitchCamera(CameraManager.CameraType.MainCamera);
 			}
@@ -228,7 +228,7 @@ namespace Assets.Scripts.Managers
 
 		public void GoToPlaneCamera()
 		{
-			if (CameraManager.Instance.ActiveCamera == CameraManager.CameraType.PlaneCamera)
+			if (CameraManager.Instance.ActiveCameraType == CameraManager.CameraType.PlaneCamera)
 			{
 				CameraManager.Instance.SwitchCamera(CameraManager.CameraType.MainCamera);
 			}

@@ -36,7 +36,7 @@ namespace Assets.Scripts.Managers
 		{
 			if (Input.GetKeyDown(KeyCode.Escape))
 			{
-				if (CameraManager.Instance.ActiveCamera != CameraManager.CameraType.MainCamera)
+				if (CameraManager.Instance.ActiveCameraType != CameraManager.CameraType.MainCamera)
 				{
 					CameraManager.Instance.SwitchCamera(CameraManager.CameraType.MainCamera);
 				}
