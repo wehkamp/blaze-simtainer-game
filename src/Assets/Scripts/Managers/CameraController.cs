@@ -98,7 +98,7 @@ namespace Assets.Scripts.Managers
 
 
 			// Check if user is focused on an UI-element
-			if (EventSystem.current.IsPointerOverGameObject()) return;
+			if (EventSystem.current.IsPointerOverGameObject() || !Cam.gameObject.activeInHierarchy) return;
 
 			// Zoom and rotation is allowed of controls are locked
 			Rotation();

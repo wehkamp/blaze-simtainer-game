@@ -16,21 +16,24 @@ namespace Assets.Scripts.Managers
 	/// </summary>
 	internal class ChaosManager : Singleton<ChaosManager>
 	{
+		// UI elements
 		public GameObject ToggleAttackModeCheckbox;
+		public Image TankUiImage;
+		public Image PlaneUiImage;
+
+		// Objects
 		private GameObject _tankGameObject;
 		private GameObject _planeGameObject;
 		private TankNavigator _tankNavigator;
 		private PlaneNavigator _planeNavigator;
 
+		// Camera's
 		private GameObject _mainCamera;
 		private GameObject _planeCamera;
 		private GameObject _tankCamera;
 
-		public Image TankUiImage;
-		public Image PlaneUiImage;
-
+		// Other
 		private bool _foundTargets;
-
 		private int _minimumBuildings = 2;
 
 		// Start is called before the first frame update
@@ -187,30 +190,40 @@ namespace Assets.Scripts.Managers
 
 		public void GoToTankCamera()
 		{
+			if (_planeNavigator != null)
+				_planeNavigator.EnableTopText = false;
 			if (_tankCamera.activeInHierarchy)
 			{
 				ResetCamera();
 				return;
 			}
+
 			_mainCamera.SetActive(false);
 			_planeCamera?.SetActive(false);
 			_tankCamera?.SetActive(true);
+			_tankNavigator.EnableTopText = true;
 		}
 
 		public void GoToPlaneCamera()
 		{
+			if (_tankNavigator != null)
+				_tankNavigator.EnableTopText = false;
 			if (_planeCamera.activeInHierarchy)
 			{
 				ResetCamera();
 				return;
 			}
+
 			_mainCamera.SetActive(false);
 			_tankCamera?.SetActive(false);
 			_planeCamera?.SetActive(true);
+			_planeNavigator.EnableTopText = true;
 		}
 
 		public void ResetCamera()
 		{
+			if (_tankNavigator != null)
+				_tankNavigator.EnableTopText = false;
 			_planeCamera?.SetActive(false);
 			_tankCamera?.SetActive(false);
 			_mainCamera.SetActive(true);

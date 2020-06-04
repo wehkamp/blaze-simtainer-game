@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections;
+using System.Linq;
 using Assets.Scripts.Interfaces;
 using Assets.Scripts.Managers;
+using Assets.Scripts.Models;
 using Assets.Scripts.Utils;
+using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -19,6 +22,8 @@ namespace Assets.Scripts.Components.Navigators
 
 		private GameObject _turret;
 
+		private TMP_Text _topText;
+
 		private bool _rotating = false;
 
 		/// <summary>
@@ -32,16 +37,55 @@ namespace Assets.Scripts.Components.Navigators
 		/// Property to see if the tank is ready to fire (will happen after rotating).
 		/// </summary>
 		public bool IsReadyToFire { get; private set; }
-		
+
 		/// <summary>
 		/// Property to enable or disable firing after the tank is at target.
 		/// </summary>
 		public bool IsFiringEnabled { get; set; } = false;
 
+		private bool _enableTopText = false;
+
+		/// <summary>
+		/// Property to display the text in the top to show info about the tank
+		/// </summary>
+		public bool EnableTopText
+		{
+			get => _enableTopText;
+			set
+			{
+				if (value)
+				{
+					if (Target != null)
+					{
+						NeighbourhoodModel neighbourhoodModel = CityManager.Instance.GameModel.Neighbourhoods
+							.Select(x => x).SingleOrDefault(x =>
+								x.VisualizedObjects.Contains(Target));
+						if (neighbourhoodModel != null)
+							_topText.text = $"Target: {neighbourhoodModel.Name}";
+					}
+					else if (IsStandby)
+					{
+						_topText.text = "Stand-by mode";
+					}
+					else
+					{
+						_topText.text = "Scanning for targets";
+					}
+				}
+				else
+				{
+					_topText.text = "";
+				}
+
+				_enableTopText = value;
+			}
+		}
+
 		void Start()
 		{
 			_agent = GetComponent<NavMeshAgent>();
 			_turret = GameObject.FindGameObjectWithTag("TankTurret");
+			_topText = GameObject.FindGameObjectWithTag("TopText").GetComponent<TMP_Text>();
 		}
 
 		/// <summary>
@@ -58,6 +102,10 @@ namespace Assets.Scripts.Components.Navigators
 				_agent.isStopped = false;
 				_agent.SetDestination(target.GameObject.transform.position);
 				HasTarget = true;
+				if (_enableTopText)
+				{
+					_topText.text = "Target found";
+				}
 			}
 		}
 
@@ -76,6 +124,11 @@ namespace Assets.Scripts.Components.Navigators
 			// Check if we have a target and if we are actually at the target
 			if (HasTarget && NavigationUtil.PathComplete(_agent))
 			{
+				if (_enableTopText)
+				{
+					_topText.text = "Arrived at target";
+				}
+
 				if (!_rotating && Target != null)
 				{
 					_agent.isStopped = true;
@@ -128,7 +181,8 @@ namespace Assets.Scripts.Components.Navigators
 			_rotating = true;
 			float startRotation = _turret.transform.eulerAngles.y;
 			float t = 0.0f;
-			while (Math.Abs(_turret.gameObject.transform.rotation.eulerAngles.y - transform.rotation.eulerAngles.y) > 0.1f)
+			while (Math.Abs(_turret.gameObject.transform.rotation.eulerAngles.y - transform.rotation.eulerAngles.y) >
+			       0.1f)
 			{
 				t += Time.deltaTime;
 				float yRotation = Mathf.Lerp(startRotation, transform.rotation.eulerAngles.y, t / 1.5f) % 360.0f;
@@ -174,6 +228,10 @@ namespace Assets.Scripts.Components.Navigators
 			HasTarget = false;
 			_agent.ResetPath();
 			IsStandby = standby;
+			if (_enableTopText)
+			{
+				_topText.text = "Stand-by";
+			}
 		}
 	}
 }

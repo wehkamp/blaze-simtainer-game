@@ -3,6 +3,7 @@ using System.Linq;
 using Assets.Scripts.Interfaces;
 using Assets.Scripts.Managers;
 using Assets.Scripts.Utils;
+using TMPro;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -30,6 +31,8 @@ namespace Assets.Scripts.Components.Navigators
 
 		private GameObject _propeller;
 
+		private TMP_Text _topText;
+
 		// Do a barrel roll
 		private bool _barrelRoll;
 
@@ -46,6 +49,22 @@ namespace Assets.Scripts.Components.Navigators
 		/// Amount of buildings that must exists before we drop a bomb on a neighbourhood.
 		/// </summary>
 		public int MinimumBuildings = 2;
+
+
+		private bool _enableTopText = false;
+
+		/// <summary>
+		/// Property to display the text in the top to show info about the tank
+		/// </summary>
+		public bool EnableTopText
+		{
+			get => _enableTopText;
+			set
+			{
+				_topText.text = value ? "Scanning for targets" : "";
+				_enableTopText = value;
+			}
+		}
 
 		// Start is called before the first frame update
 		void Start()
@@ -74,6 +93,7 @@ namespace Assets.Scripts.Components.Navigators
 
 			// Set the minimum Buildings required for chaos
 			MinimumBuildings = SettingsManager.Instance.Settings.Chaos.MinimumBuildings;
+			_topText = GameObject.FindGameObjectWithTag("TopText").GetComponent<TMP_Text>();
 		}
 
 		public void ToggleBarrelRoll()
@@ -92,7 +112,7 @@ namespace Assets.Scripts.Components.Navigators
 		Tuple<Vector3, Quaternion> SelectSpawnPoint()
 		{
 			// if Z is 500, we select something between the -500 & 500
-			int[] randomZ = { _maxZ * (-1), _maxZ};
+			int[] randomZ = {_maxZ * (-1), _maxZ};
 			// Pick a random value between the for example -500 & 500
 			int randValue = Random.Range(0, randomZ.Length);
 			Quaternion rotation;
@@ -127,6 +147,11 @@ namespace Assets.Scripts.Components.Navigators
 
 				// Reset fired for this path
 				_fired = false;
+
+				if (_enableTopText)
+				{
+					_topText.text = "Scanning for targets";
+				}
 			}
 		}
 
@@ -150,10 +175,7 @@ namespace Assets.Scripts.Components.Navigators
 			// Calculate rotation and rotate the propeller
 			if (_propeller != null)
 			{
-				Vector3 newPropellerAngles = new Vector3(_propeller.transform.eulerAngles.x,
-					_propeller.transform.eulerAngles.y,
-					_propeller.transform.eulerAngles.z + 10f);
-				_propeller.transform.eulerAngles = newPropellerAngles;
+				_propeller.transform.Rotate(0, 0, 90 * 20 * Time.deltaTime);
 			}
 
 			// If we already fired or attack mode isn't turned on, return
@@ -168,17 +190,21 @@ namespace Assets.Scripts.Components.Navigators
 
 				// Check if we hit a building with our raycast and check if the building has the correct requirements
 				if (hit.collider.gameObject.CompareTag("Building") && randomFiringEnabled && CityManager
-					    .Instance.GameModel
-					    .Neighbourhoods
-					    .Single(x => x.Name == hit.collider.gameObject.name.Replace("neighbourhood-", ""))
-					    .VisualizedObjects.Count(x=>x is IVisualizedBuilding) >= MinimumBuildings)
+					.Instance.GameModel
+					.Neighbourhoods
+					.Single(x => x.Name == hit.collider.gameObject.name.Replace("neighbourhood-", ""))
+					.VisualizedObjects.Count(x => x is IVisualizedBuilding) >= MinimumBuildings)
 				{
+					if (_enableTopText)
+					{
+						_topText.text = $"Target found! Dropped a bomb at \r\n{hit.collider.gameObject.name.Replace("neighbourhood-", "")}";
+					}
+
 					// We met the requirements Drop a bomb on the building
 					_fired = true;
 					Instantiate(AssetsManager.Instance.GetPredefinedPrefab(AssetsManager.PrefabType.Bomb),
 						new Vector3(hit.collider.gameObject.transform.position.x, transform.position.y,
 							hit.collider.gameObject.transform.position.z), Quaternion.identity);
-					Debug.Log($"HIT! {hit.collider.gameObject.name}");
 				}
 			}
 		}

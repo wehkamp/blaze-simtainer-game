@@ -55,14 +55,19 @@ namespace Assets.Scripts.Components
 			// Check if the top of boundary is below the ground
 			if (position <= 0)
 			{
-				// Create a destroyed grass tile
-				GameObject destroyedGrassTile =
-					Instantiate(
-						AssetsManager.Instance.GetPredefinedPrefab(AssetsManager.PrefabType.DestroyedGridTile), _startPos,
-						Quaternion.identity);
-				GridManager.Instance.Grid[Tile] = new TileObject
-					{GameObject = destroyedGrassTile, ObjectType = ObjectType.DestroyedBuilding};
-				destroyedGrassTile.name = gameObject.name;
+				// Create a destroyed grass tile if the tile has not been filled in the meantime
+				if (GridManager.Instance.Grid[Tile] == null || GridManager.Instance.Grid[Tile].GameObject == null)
+				{
+					GameObject destroyedGrassTile =
+						Instantiate(
+							AssetsManager.Instance.GetPredefinedPrefab(AssetsManager.PrefabType.DestroyedGridTile),
+							_startPos,
+							Quaternion.identity);
+					GridManager.Instance.Grid[Tile] = new TileObject
+						{GameObject = destroyedGrassTile, ObjectType = ObjectType.DestroyedBuilding};
+					destroyedGrassTile.name = gameObject.name;
+				}
+
 				Destroy(gameObject);
 			}
 

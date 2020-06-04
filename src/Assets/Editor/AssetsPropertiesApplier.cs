@@ -86,6 +86,7 @@ namespace Assets.Editor
 		{
 			NavMeshAgent,
 			NotWalkable,
+			Camera,
 			None
 		}
 
@@ -141,6 +142,35 @@ namespace Assets.Editor
 							NavMeshModifier navMeshModifier = targetGameObject.AddComponent<NavMeshModifier>();
 							navMeshModifier.overrideArea = true;
 							navMeshModifier.area = NavMesh.GetAreaFromName("Not Walkable");
+						}
+
+						break;
+					case ComponentType.Camera:
+						if (targetGameObject.GetComponent<Camera>() == null)
+						{
+							GameObject cameraObject = new GameObject();
+
+							Camera camera = cameraObject.AddComponent<Camera>();
+							camera.clearFlags = CameraClearFlags.Color;
+							camera.backgroundColor = new Color32(88, 85, 74, 255);
+							camera.orthographic = false;
+							switch (tag)
+							{
+								case "Plane":
+									cameraObject.tag = "PlaneCamera";
+									cameraObject.transform.position = new Vector3(-0.88f, 25.1f, -4.7f);
+									cameraObject.transform.rotation = Quaternion.Euler(70, 0, 0);
+									camera.fieldOfView = 47.1f;
+									break;
+								case "Tank":
+									cameraObject.tag = "TankCamera";
+									cameraObject.transform.position = new Vector3(-1.08f, 1f, 0.23f);
+									cameraObject.transform.rotation = Quaternion.Euler(0, 0, 0);
+									camera.fieldOfView = 60f;
+									break;
+							}
+
+							cameraObject.transform.SetParent(targetGameObject.transform);
 						}
 
 						break;

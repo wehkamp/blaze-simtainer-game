@@ -30,6 +30,7 @@ namespace Assets.Scripts.Managers
 		public GameObject OpenButton;
 
 		private GameObject _mainCamera;
+
 		// Start is called before the first frame update
 		void Start()
 		{
@@ -60,7 +61,13 @@ namespace Assets.Scripts.Managers
 		{
 			// Check if left mouse button is pressed and if there has not been clicked on an UI element
 			if (!Input.GetMouseButtonDown(0) ||
-			    UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() || !_mainCamera.activeInHierarchy) return;
+			    UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject()) return;
+
+			if (!_mainCamera.activeInHierarchy)
+			{
+				ResetHighlighting();
+				return;
+			}
 
 			// Check if we have a hit on a prefab
 			bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hitInfo,
@@ -182,9 +189,14 @@ namespace Assets.Scripts.Managers
 						NeighbourhoodModel neighbourhoodModel = CityManager.Instance.GameModel.Neighbourhoods
 							.Select(x => x).SingleOrDefault(x =>
 								x.VisualizedObjects.Contains(tankNavigator.Target));
+						string firingEnabled = tankNavigator.IsFiringEnabled ? "yes" : "no";
 						if (neighbourhoodModel != null)
-							infoText = $"Target: {neighbourhoodModel.Name}";
+							infoText = $"Target: {neighbourhoodModel.Name}\r\nFiring enabled: {firingEnabled}";
 					}
+				}
+				else if (clickedObject.CompareTag("Plane"))
+				{
+					infoText = $"Looking for targets";
 				}
 				else
 				{
