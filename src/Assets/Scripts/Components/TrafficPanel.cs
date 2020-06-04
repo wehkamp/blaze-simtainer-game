@@ -45,6 +45,7 @@ namespace Assets.Scripts.Components
 		{
 			foreach (VehiclePrefab vehicle in SettingsManager.Instance.Settings.AssetBundle.Vehicles)
 			{
+				// Create an image object and add it to the bottom bar
 				GameObject g = Instantiate(Image, BottomPanel.transform);
 				Image img = g.GetComponent<Image>();
 				img.overrideSprite = AssetsManager.Instance.GetVehicleSpritesByType(vehicle.Name);

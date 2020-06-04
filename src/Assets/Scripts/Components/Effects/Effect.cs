@@ -7,13 +7,17 @@ using UnityEngine;
 namespace Assets.Scripts.Components.Effects
 {
 	/// <summary>
-	/// Component that adds fire effects on the top of a GameObject by using the collision boundaries.
+	/// Component that adds effects on the top of a GameObject by using the collision boundaries.
+	/// Call the <see cref="SetFx"/> method to set the correct Fx prefab.
 	/// </summary>
 	public class Effect : MonoBehaviour
 	{
 		private readonly List<GameObject> _effects = new List<GameObject>();
 
-
+		/// <summary>
+		/// This function will set the correct prefab/effect that is being used to spawn on top of gameobjects.
+		/// </summary>
+		/// <param name="fxObject"></param>
 		public void SetFx(GameObject fxObject)
 		{
 			Bounds bounds = BoundariesUtil.GetMaxBounds(gameObject);
@@ -32,6 +36,7 @@ namespace Assets.Scripts.Components.Effects
 
 		void OnDestroy()
 		{
+			// Destroy all the effects that we have in our memory
 			foreach (GameObject effect in _effects)
 			{
 				Destroy(effect);

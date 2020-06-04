@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Assets.Scripts.Managers;
-using Assets.Scripts.Models;
 using Assets.Scripts.Models.VisualizedObjects;
 using TMPro;
 using UnityEngine;
@@ -54,6 +53,7 @@ namespace Assets.Scripts.Components
 				vehicles = vehicles.Where(x => x.NeighbourhoodModel.Team == TeamManager.Instance.SelectedTeam);
 			}
 
+			// Loop through all vehicles and update them
 			foreach (TrafficManager.Vehicle vehicle in vehicles)
 			{
 				if (vehicle.VehicleGameObject != null)
@@ -89,6 +89,8 @@ namespace Assets.Scripts.Components
 				// Add an event trigger object so we can make the button clickable
 				EventTrigger eventTrigger = trafficRow.AddComponent<EventTrigger>();
 				EventTrigger.Entry entry = new EventTrigger.Entry {eventID = EventTriggerType.PointerClick};
+
+				// Add a lambda with the onclick function
 				entry.callback.AddListener(eventData =>
 				{
 					OnObjectClickManager.Instance.HighlightVehicle(vehicleGameObject);

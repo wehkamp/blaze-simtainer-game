@@ -45,15 +45,18 @@ namespace Assets.Scripts.Components.Navigators
 		{
 			if (Target == null)
 			{
+				// If the target does not exists anymore for any reason, destroy this vehicle
 				Destroy(gameObject);
 			}
 			else
 			{
 				if (_agent.isActiveAndEnabled)
 				{
+					// Check if we need to drive back or need to drive to the actual target
 					_agent.SetDestination(_drivingBack ? _startPos : Target.transform.position);
 					if (enableRenderers)
 					{
+						// Enable all renders for the vehicle
 						foreach (Renderer childRenderer in GetComponentsInChildren<Renderer>())
 						{
 							childRenderer.enabled = true;

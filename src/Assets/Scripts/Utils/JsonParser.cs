@@ -38,7 +38,8 @@ namespace Assets.Scripts.Utils
 				teams.Add(team);
 			}
 
-			GameModel gameModel = new GameModel {Neighbourhoods = neighbourhoodModels, Layers = visualLayerModels, Teams = teams};
+			GameModel gameModel = new GameModel
+				{Neighbourhoods = neighbourhoodModels, Layers = visualLayerModels, Teams = teams};
 			return gameModel;
 		}
 
@@ -164,6 +165,17 @@ namespace Assets.Scripts.Utils
 			}
 
 			return updateEventModel;
+		}
+
+		/// <summary>
+		/// Function to parse the URL of a neighbourhood.
+		/// </summary>
+		/// <param name="jsonString"></param>
+		/// <returns></returns>
+		public static string ParseNeighbourhoodUrl(string jsonString)
+		{
+			JSONNode jsonOBj = JSON.Parse(jsonString);
+			return jsonOBj["url"];
 		}
 	}
 }

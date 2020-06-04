@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Runtime.InteropServices;
 using Assets.Scripts.Interfaces;
 using Assets.Scripts.Models;
 using Assets.Scripts.Utils;
@@ -161,6 +162,41 @@ namespace Assets.Scripts.Managers
 		}
 
 		/// <summary>
+		/// Function to open the web browser of the device to a specific url that belongs to a neighbourhood.
+		/// </summary>
+		/// <returns></returns>
+		public IEnumerator OpenNeighbourhoodUrl(string neighbourhoodName)
+		{
+			using (UnityWebRequest webRequest =
+				UnityWebRequest.Get($"{_gameEndpoint}/url?identifier={neighbourhoodName}"))
+			{
+				// Request and wait for the desired page.
+				webRequest.timeout = 10;
+				yield return webRequest.SendWebRequest();
+				if (webRequest.isNetworkError || webRequest.isHttpError)
+				{
+					Debug.LogWarning($"Cannot find url of neighbourhood. Error: {webRequest.error}");
+				}
+				else
+				{
+					string url = JsonParser.ParseNeighbourhoodUrl(webRequest.downloadHandler.text);
+					if (!string.IsNullOrEmpty(url))
+					{
+#if UNITY_WEBGL && !UNITY_EDITOR
+						openPage(url);
+#else
+						Application.OpenURL(url);
+#endif
+					}
+				}
+
+				yield return null;
+			}
+
+			yield return null;
+		}
+
+		/// <summary>
 		/// Kill the connection with SignalR when the API manager is being destroyed.
 		/// </summary>
 		void OnDestroy()
@@ -169,5 +205,8 @@ namespace Assets.Scripts.Managers
 			Debug.Log("Disconnecting from server.");
 			_srLib.Exit();
 		}
+
+		[DllImport("__Internal")]
+		private static extern void openPage(string url);
 	}
 }

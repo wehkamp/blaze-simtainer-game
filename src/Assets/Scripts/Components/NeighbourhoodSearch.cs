@@ -49,19 +49,23 @@ namespace Assets.Scripts.Components
 				CityManager.Instance.GameModel.Neighbourhoods.Where(x => x.Name.Contains(searchString))
 					.Take(2).ToList();
 
+			// Check how many neighbourhoods we found
 			switch (neighbourhoodModels.Count)
 			{
 				case 2:
+					// With 2 enabled both buttons
 					NothingFoundText.gameObject.SetActive(false);
 					SetButton(neighbourhoodModels[0], SearchButton1);
 					SetButton(neighbourhoodModels[1], SearchButton2);
 					break;
 				case 1:
+					// With 1 only enable one button
 					NothingFoundText.gameObject.SetActive(false);
 					SetButton(neighbourhoodModels[0], SearchButton1);
 					DisableButton(SearchButton2);
 					break;
 				default:
+					// With nothing disable both buttons and set the not found text active
 					NothingFoundText.gameObject.SetActive(true);
 					DisableButton(SearchButton1);
 					DisableButton(SearchButton2);
@@ -82,6 +86,7 @@ namespace Assets.Scripts.Components
 
 			button.gameObject.SetActive(true);
 
+			// Remove all onclick listeners and create a new one
 			button.onClick.RemoveAllListeners();
 			button.onClick.AddListener(() => { OnButtonClick(neighbourhoodModel); });
 		}

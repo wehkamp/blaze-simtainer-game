@@ -27,6 +27,7 @@ namespace Assets.Scripts.Managers
 		private float _maxDistance;
 
 		public GameObject DestroyButton;
+		public GameObject OpenButton;
 
 		// Start is called before the first frame update
 		void Start()
@@ -37,6 +38,13 @@ namespace Assets.Scripts.Managers
 			// Check with both events if renderers are removed
 			CityManager.Instance.CityUpdatedEvent.AddListener(RemovedRenderersCheck);
 			TrafficManager.Instance.TrafficUpdateEvent.AddListener(RemovedRenderersCheck);
+			CameraManager.Instance.CameraChanged.AddListener(OnCameraChanged);
+		}
+
+		private void OnCameraChanged()
+		{
+			ResetHighlighting();
+			InfoPanel.SetActive(false);
 		}
 
 		/// <summary>
@@ -47,8 +55,7 @@ namespace Assets.Scripts.Managers
 			foreach (Renderer key in _clickedObjects.Keys.ToList().Where(key => key == null))
 			{
 				_clickedObjects.Remove(key);
-				if (InfoPanel != null)
-					InfoPanel.SetActive(false);
+				InfoPanel.SetActive(false);
 			}
 		}
 
@@ -59,8 +66,10 @@ namespace Assets.Scripts.Managers
 			if (!Input.GetMouseButtonDown(0) ||
 			    UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject()) return;
 
-			// Check if we have a hit on a prefab
-			bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hitInfo,
+
+			// Check if we have a hit on a prefab with the active camera
+			bool hit = Physics.Raycast(CameraManager.Instance.ActiveCamera.ScreenPointToRay(Input.mousePosition),
+				out RaycastHit hitInfo,
 				_maxDistance,
 				_defaultLayer);
 
@@ -70,6 +79,7 @@ namespace Assets.Scripts.Managers
 			if (hit)
 			{
 				DestroyButton.SetActive(false);
+				OpenButton.SetActive(false);
 				GameObject targetObject = hitInfo.transform.gameObject;
 				// Check if the object we hit has a parent, since buildings, vehicle etc don't have parents but they do have children
 				if (hitInfo.transform.parent != null)
@@ -127,6 +137,7 @@ namespace Assets.Scripts.Managers
 							if (visualizedObject is IVisualizedBuilding visualizedBuilding)
 							{
 								DestroyButton.SetActive(true);
+								OpenButton.SetActive(true);
 								if (selectedLayer != null)
 								{
 									// Only enable destroy button for buildings
@@ -177,8 +188,9 @@ namespace Assets.Scripts.Managers
 						NeighbourhoodModel neighbourhoodModel = CityManager.Instance.GameModel.Neighbourhoods
 							.Select(x => x).SingleOrDefault(x =>
 								x.VisualizedObjects.Contains(tankNavigator.Target));
+						string firingEnabled = tankNavigator.IsFiringEnabled ? "yes" : "no";
 						if (neighbourhoodModel != null)
-							infoText = $"Target: {neighbourhoodModel.Name}";
+							infoText = $"Target: {neighbourhoodModel.Name}\r\nFiring enabled: {firingEnabled}";
 					}
 				}
 				else
@@ -237,6 +249,19 @@ namespace Assets.Scripts.Managers
 			if (_selectedObject != null)
 				StartCoroutine(ApiManager.Instance.KillVisualizedObject(_selectedObject, true));
 			InfoPanel.SetActive(false);
+		}
+
+		public void OpenSelectedObjectUrl()
+		{
+			if (!(_selectedObject is IVisualizedBuilding)) return;
+
+			NeighbourhoodModel neighbourhoodModel = CityManager.Instance.GameModel.Neighbourhoods
+				.Select(x => x).SingleOrDefault(x =>
+					x.VisualizedObjects.Contains(_selectedObject));
+			if (neighbourhoodModel != null)
+			{
+				StartCoroutine(ApiManager.Instance.OpenNeighbourhoodUrl(neighbourhoodModel.Name));
+			}
 		}
 	}
 }

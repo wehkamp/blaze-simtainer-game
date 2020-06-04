@@ -15,6 +15,10 @@ TagManager:
   - Plane
   - Vehicle
   - Fx
+  - PlaneCamera
+  - TankCamera
+  - TopTextCanvas
+  - TopText
   layers:
   - Default
   - TransparentFX
