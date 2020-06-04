@@ -54,7 +54,7 @@ namespace Assets.Scripts.Components.Navigators
 		private bool _enableTopText = false;
 
 		/// <summary>
-		/// Property to display the text in the top to show info about the tank
+		/// Property to display the text in the top to show info about the plane
 		/// </summary>
 		public bool EnableTopText
 		{

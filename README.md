@@ -467,6 +467,8 @@ To use chaos engineering there has been decided to let a tank drive around toget
 
 If a hit happens, a building will collapse and a docker container will real-time be destroyed.
 
+If you click on the tank or the plane in the UI the camera will switch to the vehicle. You can switch back to the normal view by pressing the button again.
+
 There are settings to disable the airplane or tank. There is also a setting where you can set the minimum required buildings.
 
 It is more safe to set this to 2. If you use this in a production environment it could happen that a service with only 1 instance is getting killed.
