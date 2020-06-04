@@ -29,8 +29,6 @@ namespace Assets.Scripts.Managers
 		public GameObject DestroyButton;
 		public GameObject OpenButton;
 
-		private GameObject _mainCamera;
-
 		// Start is called before the first frame update
 		void Start()
 		{
@@ -40,7 +38,6 @@ namespace Assets.Scripts.Managers
 			// Check with both events if renderers are removed
 			CityManager.Instance.CityUpdatedEvent.AddListener(RemovedRenderersCheck);
 			TrafficManager.Instance.TrafficUpdateEvent.AddListener(RemovedRenderersCheck);
-			_mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
 		}
 
 		/// <summary>
