@@ -1,11 +1,14 @@
-﻿using System;
-using Assets.Scripts.Components.Navigators;
+﻿using Assets.Scripts.Components.Navigators;
 using Assets.Scripts.Managers;
 using TMPro;
 using UnityEngine;
 
 namespace Assets.Scripts.Components
 {
+	/// <summary>
+	/// This class will manage the text on top of the screen.
+	/// If the active camera is changed it will change the text depending on the type of camera.
+	/// </summary>
 	public class TopText : MonoBehaviour
 	{
 		private TMP_Text _text;
@@ -41,13 +44,13 @@ namespace Assets.Scripts.Components
 			UpdateTextByActiveCamera();
 		}
 
+		/// <summary>
+		/// Function to update the top text depending on the active camera.
+		/// </summary>
 		private void UpdateTextByActiveCamera()
 		{
 			switch (CameraManager.Instance.ActiveCamera)
 			{
-				case CameraManager.CameraType.MainCamera:
-					_text.text = "";
-					break;
 				case CameraManager.CameraType.PlaneCamera:
 					_text.text = _planeText;
 					break;
@@ -55,7 +58,8 @@ namespace Assets.Scripts.Components
 					_text.text = _tankText;
 					break;
 				default:
-					throw new ArgumentOutOfRangeException();
+					_text.text = "";
+					break;
 			}
 		}
 	}

@@ -40,8 +40,6 @@ namespace Assets.Scripts.Components.Navigators
 		/// </summary>
 		public bool IsFiringEnabled { get; set; } = false;
 
-		public UnityEvent ReachedTarget;
-
 		void Start()
 		{
 			_agent = GetComponent<NavMeshAgent>();
