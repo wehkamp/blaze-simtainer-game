@@ -194,10 +194,6 @@ namespace Assets.Scripts.Managers
 							infoText = $"Target: {neighbourhoodModel.Name}\r\nFiring enabled: {firingEnabled}";
 					}
 				}
-				else if (clickedObject.CompareTag("Plane"))
-				{
-					infoText = $"Looking for targets";
-				}
 				else
 				{
 					TrafficManager.Vehicle v =
