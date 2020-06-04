@@ -34,6 +34,7 @@ namespace Assets.Scripts.Managers
 		void Start()
 		{
 			SettingsManager.Instance.SettingsLoadedEvent.AddListener(SettingsLoaded);
+			RuntimePreviewGenerator.BackgroundColor = new Color(0.3f,0.3f,0.3f,0.1f);
 		}
 
 		private IEnumerator LoadAssetBundle(string url)

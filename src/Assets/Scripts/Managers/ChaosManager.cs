@@ -202,6 +202,9 @@ namespace Assets.Scripts.Managers
 			_planeCamera?.SetActive(false);
 			_tankCamera?.SetActive(true);
 			_tankNavigator.EnableTopText = true;
+			TankUiImage.color = Color.green;
+			if (PlaneUiImage != null)
+				PlaneUiImage.color = Color.white;
 		}
 
 		public void GoToPlaneCamera()
@@ -218,6 +221,9 @@ namespace Assets.Scripts.Managers
 			_tankCamera?.SetActive(false);
 			_planeCamera?.SetActive(true);
 			_planeNavigator.EnableTopText = true;
+			PlaneUiImage.color = Color.green;
+			if (TankUiImage != null)
+				TankUiImage.color = Color.white;
 		}
 
 		public void ResetCamera()
@@ -227,6 +233,10 @@ namespace Assets.Scripts.Managers
 			_planeCamera?.SetActive(false);
 			_tankCamera?.SetActive(false);
 			_mainCamera.SetActive(true);
+			if(PlaneUiImage != null)
+				PlaneUiImage.color = Color.white;
+			if (TankUiImage != null)
+				TankUiImage.color = Color.white;
 		}
 	}
 }
