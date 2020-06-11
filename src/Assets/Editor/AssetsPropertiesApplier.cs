@@ -22,9 +22,11 @@ namespace Assets.Editor
 		[MenuItem("Assets/ Fix Asset properties and components")]
 		internal static void ApplyAssetPropertiesAndComponents()
 		{
+			// First read the config.json
 			StreamReader reader = new StreamReader("config.json");
 			SettingsModel settings = JsonUtility.FromJson<SettingsModel>(reader.ReadToEnd());
 
+			// Vehicles
 			foreach (VehiclePrefab vehiclePrefab in settings.AssetBundle.Vehicles)
 			{
 				foreach (string prefabName in vehiclePrefab.PrefabNames)
@@ -34,6 +36,7 @@ namespace Assets.Editor
 				}
 			}
 
+			// Buildings
 			foreach (BuildingPrefab buildingPrefab in settings.AssetBundle.Buildings)
 			{
 				foreach (Prefab prefab in buildingPrefab.Prefabs)
@@ -49,34 +52,44 @@ namespace Assets.Editor
 				}
 			}
 
+			// Chaos Elements
 			ApplyPropertiesToPrefab(settings.AssetBundle.Chaos.PlanePrefab, settings.AssetBundle.Name, "Plane");
 			ApplyPropertiesToPrefab(settings.AssetBundle.Chaos.TankPrefab, settings.AssetBundle.Name, "Tank",
 				ComponentType.NavMeshAgent);
 			ApplyPropertiesToPrefab(settings.AssetBundle.Chaos.ExplosionPrefab, settings.AssetBundle.Name, "Fx");
 			ApplyPropertiesToPrefab(settings.AssetBundle.Chaos.BombPrefab, settings.AssetBundle.Name, "Fx");
+
+			// Roads
 			ApplyPropertiesToPrefab(settings.AssetBundle.Roads.RoadIntersection, settings.AssetBundle.Name, "Road");
 			ApplyPropertiesToPrefab(settings.AssetBundle.Roads.RoadTSection, settings.AssetBundle.Name, "Road");
 			ApplyPropertiesToPrefab(settings.AssetBundle.Roads.RoadStraight, settings.AssetBundle.Name, "Road");
 			ApplyPropertiesToPrefab(settings.AssetBundle.Roads.RoadCorner, settings.AssetBundle.Name, "Road");
+
+			// Staging building
 			ApplyPropertiesToPrefab(settings.AssetBundle.StagingBuildingPrefab, settings.AssetBundle.Name, "Building",
 				ComponentType.NotWalkable, true);
+
+			// Grass tile
 			ApplyPropertiesToPrefab(settings.AssetBundle.Grass, settings.AssetBundle.Name, "Grass",
 				ComponentType.NotWalkable, true);
 
+			// Random tiles that show a destroyed building
 			foreach (string tile in settings.AssetBundle.DestroyedTiles.RandomTiles)
 			{
 				ApplyPropertiesToPrefab(tile, settings.AssetBundle.Name, "DestroyedBuilding", ComponentType.NotWalkable,
 					true);
 			}
 
+			// Layer FX
 			foreach (LayerEffect layerEffect in settings.AssetBundle.LayerEffects)
 			{
 				ApplyPropertiesToPrefab(layerEffect.PrefabName, settings.AssetBundle.Name, "Fx");
 			}
 
-			ApplyPropertiesToPrefab(settings.AssetBundle.DestroyedTiles.Fx, settings.AssetBundle.Name, "Fx");
+			// Destroyed Tile FX
 			ApplyPropertiesToPrefab(settings.AssetBundle.DestroyedTiles.Fx, settings.AssetBundle.Name, "Fx");
 
+			// Finally refresh the asset database
 			AssetDatabase.Refresh();
 		}
 
@@ -107,19 +120,22 @@ namespace Assets.Editor
 			foreach (string assetGuid in assetGuids)
 			{
 				string assetPath = AssetDatabase.GUIDToAssetPath(assetGuid);
-				// Match exact name of prefab
+				// Match exact name of prefab, because we could also get a model or a texture with the same name instead of the prefab.
 				if (Path.GetFileName(assetPath) != prefabName + ".prefab") continue;
 				Debug.Log($"Handling {prefabName}");
+
+				// Load the target prefab
 				GameObject targetGameObject =
 					PrefabUtility.LoadPrefabContents(AssetDatabase.GUIDToAssetPath(assetGuid));
 
+				// Check if it actually loads up
 				if (targetGameObject == null)
 				{
 					Debug.LogError($"Can't find prefab {prefabName}");
 					continue;
 				}
 
-				// Already done this one
+				// Already done this one if tag is already been set
 				if (targetGameObject.CompareTag(tag)) continue;
 
 				// Mark the object as a dirty object so we can edit it
@@ -129,12 +145,18 @@ namespace Assets.Editor
 				// Set the correct tag of the object
 				targetGameObject.tag = tag;
 
-				AddComponent(componentType, targetGameObject);
+				// Add a component if component type matches
+				if (componentType != ComponentType.None)
+				{
+					AddComponent(componentType, targetGameObject);
+				}
 
-				Renderer[] renders = targetGameObject.GetComponents<Renderer>();
+				// Get all renderers of the target object
+				Renderer[] renderers = targetGameObject.GetComponents<Renderer>();
 				Renderer[] childRenderers = targetGameObject.GetComponentsInChildren<Renderer>();
 
-				FixRenderers(renders, assetBundle, generateTransparentMaterials);
+				// Fix the renders, set correct properties and create a transparent material if requested
+				FixRenderers(renderers, assetBundle, generateTransparentMaterials);
 				FixRenderers(childRenderers, assetBundle, generateTransparentMaterials);
 
 				// Finally save the asset. Unload the scene, destroy the objects
@@ -144,9 +166,16 @@ namespace Assets.Editor
 
 		private static void FinishObject(GameObject targetGameObject, string assetBundle, string assetPath)
 		{
+			// Save the object as a prefab and overwrite the old prefab
 			PrefabUtility.SaveAsPrefabAsset(targetGameObject, assetPath);
+
+			// Set the correct asset bundle for the object
 			SetAssetBundles(assetBundle, assetPath);
+
+			// Unload the prefab from the memory
 			PrefabUtility.UnloadPrefabContents(targetGameObject);
+
+			// Unload scene for optimization. Only 64 scenes can be actively loaded in Unity
 			AsyncOperation unloading = SceneManager.UnloadSceneAsync(SceneManager.GetActiveScene(),
 				UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
 
@@ -164,7 +193,8 @@ namespace Assets.Editor
 		/// <param name="renderers"></param>
 		/// <param name="assetBundle"></param>
 		/// <param name="generateTransparentMaterials"></param>
-		private static void FixRenderers(IEnumerable<Renderer> renderers, string assetBundle, bool generateTransparentMaterials)
+		private static void FixRenderers(IEnumerable<Renderer> renderers, string assetBundle,
+			bool generateTransparentMaterials)
 		{
 			foreach (Renderer renderer in renderers)
 			{
@@ -260,6 +290,7 @@ namespace Assets.Editor
 				case ComponentType.NavMeshAgent:
 					if (targetGameObject.GetComponent<NavMeshAgent>() == null)
 					{
+						// Add a navmashagent which allows an object to move around as a AI
 						NavMeshAgent n = targetGameObject.AddComponent<NavMeshAgent>();
 						n.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
 						n.avoidancePriority = 0;
@@ -271,6 +302,7 @@ namespace Assets.Editor
 				case ComponentType.NotWalkable:
 					if (targetGameObject.GetComponent<NavMeshModifier>() == null)
 					{
+						// Add a navmash modifier so the navmesh will know that this object is not walkable
 						NavMeshModifier navMeshModifier = targetGameObject.AddComponent<NavMeshModifier>();
 						navMeshModifier.overrideArea = true;
 						navMeshModifier.area = NavMesh.GetAreaFromName("Not Walkable");

@@ -45,6 +45,10 @@ Paid assets that are not included:
 * City Adventure - <https://assetstore.unity.com/packages/3d/environments/city-adventure-65307> by beffio
 * Simple Apocalypse - Cartoon Assets - <https://assetstore.unity.com/packages/3d/environments/simple-apocalypse-cartoon-assets-44678>
 
+Free assets that are not included:
+
+* Skybox add-on - <https://assetstore.unity.com/packages/2d/textures-materials/sky/skybox-add-on-136594>
+
 You can replace all the assets you want in the config file that is included.
 If you want to use these assets, read chapter 5.1
 
